@@ -1,0 +1,60 @@
+import { Component, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
+import Swal from 'sweetalert2';
+
+@Component({
+  selector: 'app-solicitar-activacion',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  templateUrl: './solicitar-activacion.component.html'
+})
+export class SolicitarActivacionComponent {
+  private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+
+  loading = signal(false);
+  enviado = signal(false);
+
+  form = this.fb.group({
+    dui: ['', [Validators.required, Validators.pattern(/^\d{8}-\d$/)]]
+  });
+
+  onSubmit(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    this.loading.set(true);
+
+    this.authService.solicitarActivacion(this.form.value as any).subscribe({
+      next: (response) => {
+        this.loading.set(false);
+        this.enviado.set(true);
+        Swal.fire({
+          icon: 'success',
+          title: 'Solicitud Enviada',
+          text: response.message,
+          confirmButtonColor: '#0d6efd'
+        });
+      },
+      error: (error) => {
+        this.loading.set(false);
+        const message = error.error?.message || 'Error al procesar la solicitud';
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: message,
+          confirmButtonColor: '#0d6efd'
+        });
+      }
+    });
+  }
+
+  get f() {
+    return this.form.controls;
+  }
+}
