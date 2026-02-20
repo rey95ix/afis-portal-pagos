@@ -1,3 +1,11 @@
+/**
+ * Wrapper genérico para todas las respuestas del API
+ * El backend siempre retorna: { data: T }
+ */
+export interface ApiResponse<T> {
+  data: T;
+}
+
 export interface LoginRequest {
   identificador: string;
   password: string;

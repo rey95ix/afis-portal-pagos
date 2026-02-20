@@ -1,59 +1,248 @@
-# AfisPagos
+# Portal de Clientes - afis-pagos
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.3.
+## Descripción
 
-## Development server
+Frontend Angular para el portal de clientes del sistema AFIS. Permite a los clientes autenticarse, gestionar su perfil, cambiar contraseñas y administrar sesiones activas.
 
-To start a local development server, run:
+**URL de desarrollo:** `http://localhost:4200`
+**Backend API:** `http://localhost:4001`
 
-```bash
-ng serve
+## Tecnologías
+
+- Angular 21 (Standalone Components)
+- Bootstrap 5 + Bootstrap Icons
+- SweetAlert2 (notificaciones)
+- RxJS (programación reactiva)
+- Angular Signals (estado reactivo)
+
+## Estructura del Proyecto
+
+```
+src/app/
+├── core/                           # Servicios singleton, guards, interceptors
+│   ├── guards/
+│   │   └── auth.guard.ts           # Guards: authGuard, publicGuard
+│   ├── interceptors/
+│   │   └── auth.interceptor.ts     # Inyección de JWT en headers
+│   ├── models/
+│   │   ├── auth.model.ts           # Interfaces de auth + ApiResponse
+│   │   ├── cliente.model.ts        # Interfaces de cliente
+│   │   └── index.ts
+│   └── services/
+│       ├── auth.service.ts         # Servicio de autenticación
+│       ├── token-storage.service.ts # Manejo de tokens (sessionStorage)
+│       └── index.ts
+│
+├── features/                       # Módulos de funcionalidad
+│   ├── auth/                       # Páginas públicas de autenticación
+│   │   ├── login/
+│   │   ├── solicitar-activacion/
+│   │   ├── activar-cuenta/
+│   │   ├── forgot-password/
+│   │   └── reset-password/
+│   │
+│   └── portal/                     # Páginas protegidas del portal
+│       ├── layout/                 # Layout con navbar
+│       ├── home/                   # Dashboard
+│       ├── perfil/                 # Ver perfil
+│       ├── cambiar-password/       # Cambiar contraseña
+│       └── sesiones/               # Gestión de sesiones
+│
+├── environments/
+│   ├── environment.ts              # Configuración desarrollo
+│   └── environment.prod.ts         # Configuración producción
+│
+├── app.config.ts                   # Configuración de la aplicación
+├── app.routes.ts                   # Configuración de rutas
+├── app.ts                          # Componente raíz
+└── app.html                        # Template raíz (router-outlet)
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Convención de Respuestas del API
 
-## Code scaffolding
+**IMPORTANTE:** El backend siempre retorna las respuestas envueltas en un objeto `data`:
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```typescript
+// Estructura de respuesta del backend
+{
+  data: {
+    // Contenido real de la respuesta
+  }
+}
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### Modelo ApiResponse
 
-```bash
-ng generate --help
+En `core/models/auth.model.ts` existe el wrapper genérico:
+
+```typescript
+export interface ApiResponse<T> {
+  data: T;
+}
 ```
 
-## Building
+### Uso en Servicios
 
-To build the project run:
+Todos los servicios deben usar `ApiResponse<T>` y extraer los datos con `map()`:
 
-```bash
-ng build
+```typescript
+// Ejemplo de implementación correcta
+getProfile(): Observable<ClienteProfile> {
+  return this.http.get<ApiResponse<ClienteProfile>>(`${this.API_URL}/profile`).pipe(
+    map(response => response.data)
+  );
+}
+
+// Para POST con efectos secundarios (ej: guardar tokens)
+login(data: LoginRequest): Observable<LoginResponse> {
+  return this.http.post<ApiResponse<LoginResponse>>(`${this.API_URL}/login`, data).pipe(
+    tap(response => {
+      // Usar response.data para acceder a los datos
+      this.tokenStorage.saveTokens(response.data.access_token, response.data.refresh_token);
+    }),
+    map(response => response.data) // Siempre retornar solo data
+  );
+}
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### Patrón para Nuevos Endpoints
 
-## Running unit tests
+Al crear nuevos servicios, seguir este patrón:
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+```typescript
+import { ApiResponse } from '../models';
 
-```bash
-ng test
+// 1. Definir la interfaz de respuesta
+export interface MiRespuesta {
+  campo1: string;
+  campo2: number;
+}
+
+// 2. En el servicio
+getMisDatos(): Observable<MiRespuesta> {
+  return this.http.get<ApiResponse<MiRespuesta>>(`${this.API_URL}/endpoint`).pipe(
+    map(response => response.data)
+  );
+}
 ```
 
-## Running end-to-end tests
+## Rutas
 
-For end-to-end (e2e) testing, run:
+### Rutas Públicas (`/auth/*`)
 
-```bash
-ng e2e
+| Ruta | Componente | Descripción |
+|------|------------|-------------|
+| `/auth/login` | LoginComponent | Inicio de sesión |
+| `/auth/solicitar-activacion` | SolicitarActivacionComponent | Solicitar activación con DUI |
+| `/auth/activar-cuenta` | ActivarCuentaComponent | Activar cuenta con token |
+| `/auth/forgot-password` | ForgotPasswordComponent | Solicitar reset de contraseña |
+| `/auth/reset-password` | ResetPasswordComponent | Restablecer contraseña |
+
+### Rutas Protegidas (`/portal/*`)
+
+| Ruta | Componente | Descripción |
+|------|------------|-------------|
+| `/portal/home` | HomeComponent | Dashboard principal |
+| `/portal/perfil` | PerfilComponent | Ver información del cliente |
+| `/portal/cambiar-password` | CambiarPasswordComponent | Cambiar contraseña |
+| `/portal/sesiones` | SesionesComponent | Ver y revocar sesiones |
+
+## Configuración
+
+### URLs con Hash
+
+El proyecto usa `HashLocationStrategy` para las URLs:
+- `http://localhost:4200/#/auth/login`
+- `http://localhost:4200/#/portal/home`
+
+Configurado en `app.config.ts`:
+```typescript
+provideRouter(routes, withHashLocation())
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+### Almacenamiento de Tokens
 
-## Additional Resources
+Los tokens se almacenan en `sessionStorage` (más seguro que localStorage):
+- `cliente_access_token` - JWT de acceso
+- `cliente_refresh_token` - Token de renovación
+- `cliente_data` - Datos del cliente
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+### Interceptor HTTP
+
+El interceptor (`auth.interceptor.ts`) automáticamente:
+1. Agrega el header `Authorization: Bearer <token>` a todas las peticiones protegidas
+2. Redirige al login si recibe un 401
+
+Endpoints públicos excluidos del interceptor:
+- `/login`
+- `/solicitar-activacion`
+- `/activar-cuenta`
+- `/forgot-password`
+- `/reset-password`
+
+## Guards
+
+- **authGuard**: Protege rutas que requieren autenticación. Redirige a `/auth/login` si no hay token.
+- **publicGuard**: Protege rutas públicas. Redirige a `/portal/home` si ya está autenticado.
+
+## Comandos
+
+```bash
+# Instalar dependencias
+npm install
+
+# Desarrollo
+npm start           # http://localhost:4200
+
+# Build producción
+npm run build
+
+# Tests
+npm test
+```
+
+## Estilos
+
+### Clases Personalizadas
+
+- `.auth-container` - Contenedor centrado con gradiente para páginas de auth
+- `.auth-card` - Card blanco para formularios de auth
+
+### Bootstrap Customizado
+
+Los botones primarios tienen un gradiente personalizado definido en `styles.css`.
+
+## Notas de Desarrollo
+
+### Crear Nuevo Componente
+
+1. Crear en la carpeta correspondiente (`features/auth/` o `features/portal/`)
+2. Usar standalone component
+3. Agregar la ruta en `app.routes.ts` con lazy loading
+
+```typescript
+{
+  path: 'nuevo',
+  loadComponent: () => import('./features/portal/nuevo/nuevo.component')
+    .then(m => m.NuevoComponent)
+}
+```
+
+### Agregar Nuevo Endpoint
+
+1. Definir interfaces en `core/models/`
+2. Agregar método en el servicio correspondiente usando `ApiResponse<T>`
+3. Usar `map(response => response.data)` para extraer datos
+
+### Manejo de Errores
+
+Los errores del backend vienen en formato:
+```json
+{
+  "statusCode": 400,
+  "message": "Mensaje de error",
+  "error": "Bad Request"
+}
+```
+
+Acceder al mensaje: `error.error?.message`

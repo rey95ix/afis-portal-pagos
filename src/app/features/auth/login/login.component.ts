@@ -39,6 +39,7 @@ export class LoginComponent {
     this.authService.login(this.loginForm.value as any).subscribe({
       next: () => {
         this.loading.set(false);
+        console.log('Login exitoso');
         this.router.navigate(['/portal/home']);
       },
       error: (error) => {
