@@ -1278,3 +1278,311 @@ body {
   color: #6c757d;
   margin: 0.25rem 0 0;
 }
+
+/* ========================================
+   Payment Selection & Form Styles
+   ======================================== */
+
+/* Title row with select-all */
+.portal-info-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.portal-info-title-row .portal-info-title {
+  margin-bottom: 0;
+}
+
+.pago-select-all {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #495057;
+  cursor: pointer;
+  user-select: none;
+}
+
+.pago-select-all input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #667eea;
+}
+
+/* Checkbox in factura cards/rows */
+.factura-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #667eea;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.factura-card-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.factura-card--selected {
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+/* Selection bar (sticky bottom) */
+.pago-selection-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top: 2px solid #667eea;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 1000;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+  animation: slideUp 0.2s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.pago-selection-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.pago-selection-count {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.pago-selection-total {
+  font-size: 1.1rem;
+  color: #1a1a2e;
+}
+
+.pago-selection-note {
+  font-size: 0.75rem;
+  color: #8b95a5;
+  font-style: italic;
+}
+
+.pago-selection-btn {
+  white-space: nowrap;
+}
+
+/* Payment form card */
+.pago-form-card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  max-width: 480px;
+}
+
+.pago-form-summary {
+  background: #f0f2ff;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pago-form-summary-label {
+  font-size: 0.85rem;
+  color: #495057;
+}
+
+.pago-form-summary-total {
+  font-size: 1.05rem;
+  color: #1a1a2e;
+}
+
+.pago-form-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+/* Card input with brand badge */
+.card-input-group {
+  position: relative;
+}
+
+.card-input-group .form-control {
+  padding-right: 3.5rem;
+}
+
+.card-brand-badge {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.card-brand--visa {
+  background: #1a1f71;
+  color: white;
+}
+
+.card-brand--mc {
+  background: #eb001b;
+  color: white;
+}
+
+/* Payment result banner */
+.pago-result {
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  position: relative;
+  animation: fadeIn 0.3s ease;
+}
+
+.pago-result--success {
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+}
+
+.pago-result--error {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+}
+
+.pago-result-icon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.pago-result--success .pago-result-icon {
+  color: #28a745;
+}
+
+.pago-result--error .pago-result-icon {
+  color: #dc3545;
+}
+
+.pago-result-body h4 {
+  margin: 0 0 0.25rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.pago-result--success .pago-result-body h4 {
+  color: #155724;
+}
+
+.pago-result--error .pago-result-body h4 {
+  color: #721c24;
+}
+
+.pago-result-body p {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+}
+
+.pago-result--success .pago-result-body p {
+  color: #155724;
+}
+
+.pago-result--error .pago-result-body p {
+  color: #721c24;
+}
+
+.pago-result-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  font-size: 0.85rem;
+  color: #155724;
+  margin-bottom: 0.5rem;
+}
+
+.pago-result-facturas {
+  font-size: 0.85rem;
+  color: #155724;
+}
+
+.pago-result-factura-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.pago-result-dismiss {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  border: none;
+  background: none;
+  font-size: 1.1rem;
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+.pago-result-dismiss:hover {
+  opacity: 1;
+}
+
+/* Responsive adjustments for payment */
+@media (max-width: 575.98px) {
+  .pago-selection-bar {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    align-items: stretch;
+  }
+
+  .pago-selection-info {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .pago-selection-btn {
+    width: 100%;
+  }
+
+  .pago-form-card {
+    padding: 1rem;
+  }
+
+  .pago-form-summary {
+    flex-direction: column;
+    gap: 0.25rem;
+    text-align: center;
+  }
+
+  .pago-result {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .pago-result-details {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}

@@ -73,3 +73,28 @@ export interface FacturaItem {
   numeroFactura: string | null;
   estado: string;
 }
+
+export interface PagoTarjetaRequest {
+  idFacturas: number[];
+  numeroTarjeta: string;
+  cvv2: string;
+  fechaExpiracion: string;
+  nombreTarjetahabiente: string;
+}
+
+export interface PagoTarjetaResponse {
+  exitoso: boolean;
+  mensaje: string;
+  numeroAutorizacion?: string;
+  terminacionTarjeta?: string;
+  distribucion?: {
+    items: Array<{
+      idFactura: number;
+      cuota: number | null;
+      montoAplicado: number;
+      estadoResultante: string;
+    }>;
+    montoTotal: number;
+    montoDistribuido: number;
+  };
+}

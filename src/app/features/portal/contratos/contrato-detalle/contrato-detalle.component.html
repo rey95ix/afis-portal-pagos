@@ -169,9 +169,138 @@
     </div>
   </div>
 
+  <!-- Payment Result -->
+  @if (paymentResult(); as result) {
+    <div class="pago-result" [class.pago-result--success]="result.exitoso" [class.pago-result--error]="!result.exitoso">
+      <div class="pago-result-icon">
+        <i class="bi" [class.bi-check-circle-fill]="result.exitoso" [class.bi-x-circle-fill]="!result.exitoso"></i>
+      </div>
+      <div class="pago-result-body">
+        <h4>{{ result.exitoso ? 'Pago exitoso' : 'Pago rechazado' }}</h4>
+        <p>{{ result.mensaje }}</p>
+        @if (result.exitoso && result.numeroAutorizacion) {
+          <div class="pago-result-details">
+            <span><strong>Autorización:</strong> {{ result.numeroAutorizacion }}</span>
+            @if (result.terminacionTarjeta) {
+              <span><strong>Tarjeta:</strong> ****{{ result.terminacionTarjeta }}</span>
+            }
+            @if (result.distribucion) {
+              <span><strong>Monto:</strong> ${{ result.distribucion.montoDistribuido | number:'1.2-2' }}</span>
+            }
+          </div>
+          @if (result.distribucion?.items?.length) {
+            <div class="pago-result-facturas">
+              <strong>Facturas pagadas:</strong>
+              @for (item of result.distribucion!.items; track item.idFactura) {
+                <span class="pago-result-factura-item">
+                  Cuota {{ item.cuota || 'Inst.' }} — ${{ item.montoAplicado | number:'1.2-2' }}
+                  <span class="portal-servicio-badge portal-servicio-badge--activo">{{ item.estadoResultante }}</span>
+                </span>
+              }
+            </div>
+          }
+        }
+      </div>
+      <button class="btn btn-sm btn-outline-secondary pago-result-dismiss" (click)="dismissResult()">
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+  }
+
+  <!-- Payment Form -->
+  @if (showPaymentForm()) {
+    <div class="portal-info-section">
+      <h3 class="portal-info-title"><i class="bi bi-credit-card"></i> Pagar con Tarjeta</h3>
+      <div class="pago-form-card">
+        <!-- Selected invoices summary -->
+        <div class="pago-form-summary">
+          <div class="pago-form-summary-label">Facturas seleccionadas: {{ selectedCount() }}</div>
+          <div class="pago-form-summary-total">
+            Total a pagar: <strong>${{ totalAPagar() | number:'1.2-2' }}</strong>
+          </div>
+        </div>
+
+        <form [formGroup]="cardForm" (ngSubmit)="submitPayment()">
+          <!-- Cardholder name -->
+          <div class="mb-3">
+            <label class="form-label">Nombre del tarjetahabiente</label>
+            <input type="text" class="form-control" formControlName="nombreTarjetahabiente"
+                   placeholder="Como aparece en la tarjeta" autocomplete="cc-name">
+          </div>
+
+          <!-- Card number -->
+          <div class="mb-3">
+            <label class="form-label">Número de tarjeta</label>
+            <div class="card-input-group">
+              <input type="text" class="form-control" formControlName="numeroTarjeta"
+                     placeholder="0000 0000 0000 0000" maxlength="19" autocomplete="cc-number"
+                     inputmode="numeric">
+              @if (cardBrand(); as brand) {
+                <span class="card-brand-badge" [class.card-brand--visa]="brand === 'VISA'" [class.card-brand--mc]="brand === 'MC'">
+                  {{ brand }}
+                </span>
+              }
+            </div>
+          </div>
+
+          <!-- Expiration + CVV row -->
+          <div class="row mb-3">
+            <div class="col-4">
+              <label class="form-label">Mes</label>
+              <select class="form-select" formControlName="mesExpiracion" autocomplete="cc-exp-month">
+                <option value="">MM</option>
+                @for (m of meses; track m) {
+                  <option [value]="m">{{ m }}</option>
+                }
+              </select>
+            </div>
+            <div class="col-4">
+              <label class="form-label">Año</label>
+              <select class="form-select" formControlName="anioExpiracion" autocomplete="cc-exp-year">
+                <option value="">AAAA</option>
+                @for (a of anios; track a) {
+                  <option [value]="a">{{ a }}</option>
+                }
+              </select>
+            </div>
+            <div class="col-4">
+              <label class="form-label">CVV</label>
+              <input type="password" class="form-control" formControlName="cvv2"
+                     placeholder="***" maxlength="4" autocomplete="cc-csc" inputmode="numeric">
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="pago-form-actions">
+            <button type="button" class="btn btn-outline-secondary" (click)="cancelPayment()" [disabled]="paymentLoading()">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="cardForm.invalid || paymentLoading()">
+              @if (paymentLoading()) {
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                Procesando...
+              } @else {
+                <i class="bi bi-lock-fill me-1"></i>
+                Pagar ${{ totalAPagar() | number:'1.2-2' }}
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
   <!-- Facturas -->
   <div class="portal-info-section">
-    <h3 class="portal-info-title">Facturas</h3>
+    <div class="portal-info-title-row">
+      <h3 class="portal-info-title">Facturas</h3>
+      @if (facturasConSaldo().length > 0 && !showPaymentForm()) {
+        <label class="pago-select-all">
+          <input type="checkbox" [checked]="allPendingSelected()" (change)="selectAllPending()">
+          Seleccionar todas pendientes
+        </label>
+      }
+    </div>
 
     @if (facturas().length === 0) {
       <div class="portal-info-card">
@@ -184,17 +313,25 @@
       <!-- Mobile: factura cards -->
       <div class="factura-cards">
         @for (factura of facturas(); track factura.idFactura) {
-          <div class="factura-card" [ngClass]="getFacturaCardClass(factura.estadoPago)">
+          <div class="factura-card" [ngClass]="getFacturaCardClass(factura.estadoPago)"
+               [class.factura-card--selected]="isSelected(factura.idFactura)">
             <div class="factura-card-header">
-              <div>
-                <div class="factura-card-cuota">
-                  @if (factura.esInstalacion) {
-                    Instalación
-                  } @else {
-                    Cuota {{ factura.numeroCuota }}/{{ factura.totalCuotas }}
-                  }
+              <div class="factura-card-header-left">
+                @if (factura.saldoPendiente > 0 && !showPaymentForm()) {
+                  <input type="checkbox" class="factura-checkbox"
+                         [checked]="isSelected(factura.idFactura)"
+                         (change)="toggleFactura(factura.idFactura)">
+                }
+                <div>
+                  <div class="factura-card-cuota">
+                    @if (factura.esInstalacion) {
+                      Instalación
+                    } @else {
+                      Cuota {{ factura.numeroCuota }}/{{ factura.totalCuotas }}
+                    }
+                  </div>
+                  <div class="factura-card-periodo">{{ formatPeriodo(factura.periodoInicio, factura.periodoFin) }}</div>
                 </div>
-                <div class="factura-card-periodo">{{ formatPeriodo(factura.periodoInicio, factura.periodoFin) }}</div>
               </div>
               <span class="portal-servicio-badge" [class]="getEstadoPagoBadgeClass(factura.estadoPago)">
                 {{ factura.estadoPago }}
@@ -231,6 +368,9 @@
             <table class="table table-hover mb-0">
               <thead class="table-light">
                 <tr>
+                  @if (!showPaymentForm()) {
+                    <th style="width: 40px;"></th>
+                  }
                   <th>Cuota</th>
                   <th>Período</th>
                   <th>Vencimiento</th>
@@ -243,7 +383,16 @@
               </thead>
               <tbody>
                 @for (factura of facturas(); track factura.idFactura) {
-                  <tr>
+                  <tr [class.table-active]="isSelected(factura.idFactura)">
+                    @if (!showPaymentForm()) {
+                      <td>
+                        @if (factura.saldoPendiente > 0) {
+                          <input type="checkbox" class="form-check-input factura-checkbox"
+                                 [checked]="isSelected(factura.idFactura)"
+                                 (change)="toggleFactura(factura.idFactura)">
+                        }
+                      </td>
+                    }
                     <td>
                       @if (factura.esInstalacion) {
                         <span class="portal-servicio-badge portal-servicio-badge--activo">Instalación</span>
@@ -277,4 +426,18 @@
       </div>
     }
   </div>
+
+  <!-- Selection bar (sticky bottom) -->
+  @if (selectedCount() > 0 && !showPaymentForm()) {
+    <div class="pago-selection-bar">
+      <div class="pago-selection-info">
+        <span class="pago-selection-count">{{ selectedCount() }} factura(s) seleccionada(s)</span>
+        <span class="pago-selection-total">Total: <strong>${{ totalAPagar() | number:'1.2-2' }}</strong></span>
+        <small class="pago-selection-note">El pago se aplicara a las facturas mas antiguas primero</small>
+      </div>
+      <button class="btn btn-primary pago-selection-btn" (click)="openPaymentForm()">
+        <i class="bi bi-credit-card me-1"></i> Pagar con Tarjeta
+      </button>
+    </div>
+  }
 }
