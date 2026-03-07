@@ -63,7 +63,7 @@ export const routes: Routes = [
         path: 'contratos/:id',
         loadComponent: () => import('./features/portal/contratos/contrato-detalle/contrato-detalle.component').then(m => m.ContratoDetalleComponent)
       },
-      { path: '', redirectTo: 'home', pathMatch: 'full' }
+      { path: '', redirectTo: 'contratos', pathMatch: 'full' }
     ]
   },
 

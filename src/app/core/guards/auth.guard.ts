@@ -22,6 +22,6 @@ export const publicGuard: CanActivateFn = () => {
     return true;
   }
 
-  router.navigate(['/portal/home']);
+  router.navigate(['/portal/contratos']);
   return false;
 };

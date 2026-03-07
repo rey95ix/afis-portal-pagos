@@ -71,7 +71,7 @@ export class CambiarPasswordComponent {
           text: 'Tu contraseña ha sido cambiada exitosamente.',
           confirmButtonColor: '#0d6efd'
         }).then(() => {
-          this.router.navigate(['/portal/home']);
+          this.router.navigate(['/portal/contratos']);
         });
       },
       error: (error) => {

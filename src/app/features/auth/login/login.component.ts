@@ -40,7 +40,7 @@ export class LoginComponent {
       next: () => {
         this.loading.set(false);
         console.log('Login exitoso');
-        this.router.navigate(['/portal/home']);
+        this.router.navigate(['/portal/contratos']);
       },
       error: (error) => {
         this.loading.set(false);
