@@ -55,6 +55,14 @@ export const routes: Routes = [
         path: 'sesiones',
         loadComponent: () => import('./features/portal/sesiones/sesiones.component').then(m => m.SesionesComponent)
       },
+      {
+        path: 'contratos',
+        loadComponent: () => import('./features/portal/contratos/contratos.component').then(m => m.ContratosComponent)
+      },
+      {
+        path: 'contratos/:id',
+        loadComponent: () => import('./features/portal/contratos/contrato-detalle/contrato-detalle.component').then(m => m.ContratoDetalleComponent)
+      },
       { path: '', redirectTo: 'home', pathMatch: 'full' }
     ]
   },

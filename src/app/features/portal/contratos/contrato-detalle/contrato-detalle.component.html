@@ -1,0 +1,280 @@
+<a routerLink="/portal/contratos" class="contrato-back-btn">
+  <i class="bi bi-arrow-left"></i> Contratos
+</a>
+
+@if (loading()) {
+  <div class="portal-loading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p>Cargando detalle del contrato...</p>
+  </div>
+} @else if (error()) {
+  <div class="portal-error">
+    <i class="bi bi-exclamation-triangle"></i>
+    <span>Error al cargar el contrato. Verifica que el contrato existe.</span>
+  </div>
+} @else if (contrato(); as c) {
+  <!-- Hero -->
+  <div class="contrato-hero">
+    <div class="contrato-hero-code">{{ c.codigo }}</div>
+    <span class="portal-servicio-badge" [class]="getServicioBadgeClass(c.estado)">
+      {{ formatEstado(c.estado) }}
+    </span>
+    <div class="contrato-hero-plan">{{ c.plan.nombre }}</div>
+    <div class="contrato-hero-type">{{ c.plan.tipoServicio }} · {{ c.plan.tipoPlan }}</div>
+    <div class="contrato-hero-price">
+      ${{ c.plan.precio | number:'1.2-2' }} <span>/mes</span>
+    </div>
+    @if (c.plan.velocidadBajada) {
+      <div class="contrato-hero-speed">
+        <i class="bi bi-speedometer2"></i>
+        {{ c.plan.velocidadBajada }} Mbps bajada · {{ c.plan.velocidadSubida }} Mbps subida
+      </div>
+    }
+  </div>
+
+  <!-- Info Sections -->
+  <div class="contrato-info-grid">
+    <!-- Ciclo de Facturación -->
+    <div class="portal-info-section">
+      <h3 class="portal-info-title">Ciclo de Facturación</h3>
+      <div class="portal-info-card">
+        <div class="portal-info-row">
+          <i class="bi bi-arrow-repeat"></i>
+          <div>
+            <span class="portal-info-label">Ciclo</span>
+            <span class="portal-info-value">{{ c.ciclo.nombre }}</span>
+          </div>
+        </div>
+        <div class="portal-info-row">
+          <i class="bi bi-calendar-event"></i>
+          <div>
+            <span class="portal-info-label">Día de corte</span>
+            <span class="portal-info-value">Día {{ c.ciclo.diaCorte }}</span>
+          </div>
+        </div>
+        <div class="portal-info-row">
+          <i class="bi bi-calendar-check"></i>
+          <div>
+            <span class="portal-info-label">Día de vencimiento</span>
+            <span class="portal-info-value">Día {{ c.ciclo.diaVencimiento }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vigencia -->
+    <div class="portal-info-section">
+      <h3 class="portal-info-title">Vigencia</h3>
+      <div class="portal-info-card">
+        <div class="portal-info-row">
+          <i class="bi bi-calendar2-plus"></i>
+          <div>
+            <span class="portal-info-label">Fecha inicio</span>
+            <span class="portal-info-value">{{ formatDate(c.fechaInicioContrato) }}</span>
+          </div>
+        </div>
+        <div class="portal-info-row">
+          <i class="bi bi-calendar2-x"></i>
+          <div>
+            <span class="portal-info-label">Fecha fin</span>
+            <span class="portal-info-value">{{ formatDate(c.fechaFinContrato) }}</span>
+          </div>
+        </div>
+        <div class="portal-info-row">
+          <i class="bi bi-clock-history"></i>
+          <div>
+            <span class="portal-info-label">Duración</span>
+            <span class="portal-info-value">{{ c.mesesContrato }} meses</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dirección -->
+    <div class="portal-info-section">
+      <h3 class="portal-info-title">Dirección de Servicio</h3>
+      <div class="portal-info-card">
+        <div class="portal-info-row">
+          <i class="bi bi-geo-alt"></i>
+          <div>
+            <span class="portal-info-label">Dirección</span>
+            <span class="portal-info-value">{{ c.direccionServicio.direccion }}</span>
+          </div>
+        </div>
+        @if (c.direccionServicio.colonia || c.direccionServicio.municipio) {
+          <div class="portal-info-row">
+            <i class="bi bi-building"></i>
+            <div>
+              <span class="portal-info-label">Ubicación</span>
+              <span class="portal-info-value">
+                @if (c.direccionServicio.colonia) { {{ c.direccionServicio.colonia }}, }
+                {{ c.direccionServicio.municipio }}, {{ c.direccionServicio.departamento }}
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Instalación -->
+    <div class="portal-info-section">
+      <h3 class="portal-info-title">Instalación</h3>
+      <div class="portal-info-card">
+        @if (c.instalacion) {
+          <div class="portal-info-row">
+            <i class="bi bi-check-circle"></i>
+            <div>
+              <span class="portal-info-label">Estado</span>
+              <span class="portal-info-value">{{ c.instalacion.instalado ? 'Instalado' : 'Pendiente' }}</span>
+            </div>
+          </div>
+          @if (c.instalacion.fechaInstalacion) {
+            <div class="portal-info-row">
+              <i class="bi bi-calendar2-check"></i>
+              <div>
+                <span class="portal-info-label">Fecha instalación</span>
+                <span class="portal-info-value">{{ formatDate(c.instalacion.fechaInstalacion) }}</span>
+              </div>
+            </div>
+          }
+          @if (c.instalacion.wifiNombre) {
+            <div class="portal-info-row">
+              <i class="bi bi-wifi"></i>
+              <div>
+                <span class="portal-info-label">Red Wi-Fi</span>
+                <span class="portal-info-value">{{ c.instalacion.wifiNombre }}</span>
+              </div>
+            </div>
+          }
+        } @else {
+          <div class="portal-info-row">
+            <i class="bi bi-info-circle"></i>
+            <div>
+              <span class="portal-info-value" style="color: #6c757d;">Sin datos de instalación</span>
+            </div>
+          </div>
+        }
+        @if (c.costoInstalacion) {
+          <div class="portal-info-row">
+            <i class="bi bi-cash"></i>
+            <div>
+              <span class="portal-info-label">Costo instalación</span>
+              <span class="portal-info-value">${{ c.costoInstalacion | number:'1.2-2' }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Facturas -->
+  <div class="portal-info-section">
+    <h3 class="portal-info-title">Facturas</h3>
+
+    @if (facturas().length === 0) {
+      <div class="portal-info-card">
+        <div class="portal-empty-state">
+          <i class="bi bi-inbox"></i>
+          <p>No hay facturas generadas para este contrato.</p>
+        </div>
+      </div>
+    } @else {
+      <!-- Mobile: factura cards -->
+      <div class="factura-cards">
+        @for (factura of facturas(); track factura.idFactura) {
+          <div class="factura-card" [ngClass]="getFacturaCardClass(factura.estadoPago)">
+            <div class="factura-card-header">
+              <div>
+                <div class="factura-card-cuota">
+                  @if (factura.esInstalacion) {
+                    Instalación
+                  } @else {
+                    Cuota {{ factura.numeroCuota }}/{{ factura.totalCuotas }}
+                  }
+                </div>
+                <div class="factura-card-periodo">{{ formatPeriodo(factura.periodoInicio, factura.periodoFin) }}</div>
+              </div>
+              <span class="portal-servicio-badge" [class]="getEstadoPagoBadgeClass(factura.estadoPago)">
+                {{ factura.estadoPago }}
+              </span>
+            </div>
+            <div class="factura-card-grid">
+              <div class="factura-card-item">
+                <span class="factura-card-label">Total</span>
+                <span class="factura-card-value">${{ factura.total | number:'1.2-2' }}</span>
+              </div>
+              <div class="factura-card-item">
+                <span class="factura-card-label">Mora</span>
+                <span class="factura-card-value" [class.factura-card-value--danger]="factura.montoMora > 0">
+                  {{ factura.montoMora > 0 ? ('$' + (factura.montoMora | number:'1.2-2')) : '-' }}
+                </span>
+              </div>
+              <div class="factura-card-item">
+                <span class="factura-card-label">Abonado</span>
+                <span class="factura-card-value">${{ factura.montoAbonado | number:'1.2-2' }}</span>
+              </div>
+              <div class="factura-card-item">
+                <span class="factura-card-label">Saldo</span>
+                <span class="factura-card-value factura-card-value--highlight">${{ factura.saldoPendiente | number:'1.2-2' }}</span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Desktop: tabla clásica -->
+      <div class="factura-table">
+        <div class="portal-info-card">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Cuota</th>
+                  <th>Período</th>
+                  <th>Vencimiento</th>
+                  <th class="text-end">Total</th>
+                  <th class="text-end">Mora</th>
+                  <th class="text-end">Abonado</th>
+                  <th class="text-end">Saldo</th>
+                  <th class="text-center">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (factura of facturas(); track factura.idFactura) {
+                  <tr>
+                    <td>
+                      @if (factura.esInstalacion) {
+                        <span class="portal-servicio-badge portal-servicio-badge--activo">Instalación</span>
+                      } @else {
+                        {{ factura.numeroCuota }}/{{ factura.totalCuotas }}
+                      }
+                    </td>
+                    <td>{{ formatPeriodo(factura.periodoInicio, factura.periodoFin) }}</td>
+                    <td>{{ formatDate(factura.fechaVencimiento) }}</td>
+                    <td class="text-end">${{ factura.total | number:'1.2-2' }}</td>
+                    <td class="text-end">
+                      @if (factura.montoMora > 0) {
+                        <span class="text-danger">${{ factura.montoMora | number:'1.2-2' }}</span>
+                      } @else {
+                        -
+                      }
+                    </td>
+                    <td class="text-end">${{ factura.montoAbonado | number:'1.2-2' }}</td>
+                    <td class="text-end fw-bold">${{ factura.saldoPendiente | number:'1.2-2' }}</td>
+                    <td class="text-center">
+                      <span class="portal-servicio-badge" [class]="getEstadoPagoBadgeClass(factura.estadoPago)">
+                        {{ factura.estadoPago }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}

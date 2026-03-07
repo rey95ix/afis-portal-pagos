@@ -110,8 +110,18 @@ export class ActivarCuentaComponent implements OnInit {
     return this.form.controls;
   }
 
-  getPasswordStrength(): { text: string; class: string; width: string } {
-    const password = this.f['password'].value || '';
+  get passwordValue(): string {
+    return this.f['password'].value || '';
+  }
+
+  get hasMinLength(): boolean { return this.passwordValue.length >= 8; }
+  get hasUppercase(): boolean { return /[A-Z]/.test(this.passwordValue); }
+  get hasLowercase(): boolean { return /[a-z]/.test(this.passwordValue); }
+  get hasNumber(): boolean { return /\d/.test(this.passwordValue); }
+  get hasSpecialChar(): boolean { return /[@$!%*?&]/.test(this.passwordValue); }
+
+  getPasswordStrength(): { text: string; colorClass: string; level: number } {
+    const password = this.passwordValue;
     let strength = 0;
 
     if (password.length >= 8) strength++;
@@ -120,8 +130,8 @@ export class ActivarCuentaComponent implements OnInit {
     if (/\d/.test(password)) strength++;
     if (/[@$!%*?&]/.test(password)) strength++;
 
-    if (strength <= 2) return { text: 'Débil', class: 'bg-danger', width: '33%' };
-    if (strength <= 4) return { text: 'Media', class: 'bg-warning', width: '66%' };
-    return { text: 'Fuerte', class: 'bg-success', width: '100%' };
+    if (strength <= 2) return { text: 'Débil', colorClass: 'danger', level: 1 };
+    if (strength <= 4) return { text: 'Media', colorClass: 'warning', level: 2 };
+    return { text: 'Fuerte', colorClass: 'success', level: 3 };
   }
 }

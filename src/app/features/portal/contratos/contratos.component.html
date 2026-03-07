@@ -1,0 +1,53 @@
+<div class="portal-page-header">
+  <h2 class="portal-page-title">
+    <i class="bi bi-file-earmark-text me-2"></i>Mis Contratos
+  </h2>
+  <p class="portal-page-subtitle">Consulta el estado de tus contratos de servicio.</p>
+</div>
+
+@if (loading()) {
+  <div class="portal-loading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p>Cargando contratos...</p>
+  </div>
+} @else if (error()) {
+  <div class="portal-error">
+    <i class="bi bi-exclamation-triangle"></i>
+    <span>Error al cargar los contratos.</span>
+    <button (click)="loadContratos()">Reintentar</button>
+  </div>
+} @else if (contratos().length === 0) {
+  <div class="portal-empty-state">
+    <i class="bi bi-inbox"></i>
+    <p>No tienes contratos registrados.</p>
+  </div>
+} @else {
+  <div class="contrato-list">
+    @for (contrato of contratos(); track contrato.idContrato) {
+      <a [routerLink]="['/portal/contratos', contrato.idContrato]" class="contrato-card">
+        <div class="contrato-card-icon">
+          <i class="bi bi-router"></i>
+        </div>
+        <div class="contrato-card-body">
+          <span class="contrato-card-plan">{{ contrato.plan.nombre }}</span>
+          <span class="contrato-card-info">
+            @if (contrato.plan.velocidadBajada) {
+              <i class="bi bi-speedometer2"></i>
+              {{ contrato.plan.velocidadBajada }}/{{ contrato.plan.velocidadSubida }} Mbps
+            }
+            · {{ contrato.ciclo.nombre }}
+          </span>
+        </div>
+        <div class="contrato-card-meta">
+          <span class="contrato-card-price">${{ contrato.plan.precio | number:'1.2-2' }}</span>
+          <span class="portal-servicio-badge" [class]="getServicioBadgeClass(contrato.estado)">
+            {{ formatEstado(contrato.estado) }}
+          </span>
+        </div>
+        <i class="bi bi-chevron-right contrato-card-arrow"></i>
+      </a>
+    }
+  </div>
+}

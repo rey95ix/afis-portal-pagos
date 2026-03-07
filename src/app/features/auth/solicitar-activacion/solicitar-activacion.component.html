@@ -1,67 +1,105 @@
-<div class="auth-container">
-  <div class="auth-card">
-    <div class="text-center mb-4">
-      <i class="bi bi-person-plus display-1 text-primary"></i>
-      <h2 class="mt-3">Activar Cuenta</h2>
-      <p class="text-muted">Ingresa tu DUI para recibir las instrucciones de activación</p>
+<div class="auth-container auth-split">
+  <!-- Panel Izquierdo - Branding -->
+  <div class="auth-brand-panel">
+    <div class="auth-brand-content">
+      <!-- Ilustración CSS - Persona con órbitas de activación -->
+      <div class="auth-brand-illustration">
+        <div class="center-icon">
+          <i class="bi bi-person-check"></i>
+        </div>
+        <div class="orbit-ring">
+          <span class="orbit-icon"><i class="bi bi-envelope"></i></span>
+          <span class="orbit-icon"><i class="bi bi-card-text"></i></span>
+          <span class="orbit-icon"><i class="bi bi-shield-check"></i></span>
+          <span class="orbit-icon"><i class="bi bi-unlock"></i></span>
+        </div>
+      </div>
+
+      <h1>AFIS</h1>
+      <p class="brand-subtitle">Activación de Cuenta</p>
+
+      <!-- Feature pills -->
+      <div class="auth-brand-features">
+        <div class="feature-pill">
+          <i class="bi bi-lightning"></i>
+          <span>Proceso rápido</span>
+        </div>
+        <div class="feature-pill">
+          <i class="bi bi-card-text"></i>
+          <span>Verificación por DUI</span>
+        </div>
+        <div class="feature-pill">
+          <i class="bi bi-door-open"></i>
+          <span>Acceso inmediato</span>
+        </div>
+      </div>
     </div>
+  </div>
 
-    @if (enviado()) {
-      <div class="alert alert-success">
-        <i class="bi bi-check-circle me-2"></i>
-        <strong>Solicitud enviada.</strong> Revisa tu correo electrónico para continuar con la activación de tu cuenta.
+  <!-- Panel Derecho - Formulario -->
+  <div class="auth-form-panel">
+    <div class="auth-card">
+      <div class="text-center mb-4">
+        <h2 class="auth-welcome-title">Activar Cuenta</h2>
+        <p class="auth-welcome-subtitle">Ingresa tu DUI para recibir las instrucciones de activación</p>
       </div>
-      <div class="text-center mt-4">
-        <a routerLink="/auth/login" class="btn btn-primary">
-          <i class="bi bi-arrow-left me-2"></i>
-          Volver al Login
-        </a>
-      </div>
-    } @else {
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div class="mb-4">
-          <label for="dui" class="form-label">Número de DUI</label>
-          <div class="input-group">
-            <span class="input-group-text">
-              <i class="bi bi-card-text"></i>
-            </span>
-            <input
-              type="text"
-              class="form-control"
-              id="dui"
-              formControlName="dui"
-              placeholder="12345678-9"
-              maxlength="10"
-              [class.is-invalid]="f['dui'].touched && f['dui'].invalid"
-            />
-          </div>
-          @if (f['dui'].touched && f['dui'].errors?.['required']) {
-            <div class="text-danger small mt-1">El DUI es requerido</div>
-          }
-          @if (f['dui'].touched && f['dui'].errors?.['pattern']) {
-            <div class="text-danger small mt-1">Formato de DUI inválido (Ej: 12345678-9)</div>
-          }
-        </div>
 
-        <div class="d-grid mb-3">
-          <button type="submit" class="btn btn-primary btn-lg" [disabled]="loading()">
-            @if (loading()) {
-              <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-              Procesando...
-            } @else {
-              <i class="bi bi-send me-2"></i>
-              Solicitar Activación
-            }
-          </button>
-        </div>
-
-        <div class="text-center">
-          <a routerLink="/auth/login" class="text-decoration-none">
-            <i class="bi bi-arrow-left me-1"></i>
+      @if (enviado()) {
+        <div class="auth-success-state">
+          <i class="bi bi-check-circle-fill auth-success-icon"></i>
+          <p class="auth-success-title">Solicitud enviada</p>
+          <p class="auth-success-text">Revisa tu correo electrónico para continuar con la activación de tu cuenta.</p>
+          <a routerLink="/auth/login" class="btn btn-primary">
+            <i class="bi bi-arrow-left me-2"></i>
             Volver al Login
           </a>
         </div>
-      </form>
-    }
+      } @else {
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <div class="mb-4">
+            <label for="dui" class="form-label">Número de DUI</label>
+            <div class="input-group">
+              <span class="input-group-text">
+                <i class="bi bi-card-text"></i>
+              </span>
+              <input
+                type="text"
+                class="form-control"
+                id="dui"
+                formControlName="dui"
+                placeholder="12345678-9"
+                maxlength="10"
+                [class.is-invalid]="f['dui'].touched && f['dui'].invalid"
+              />
+            </div>
+            @if (f['dui'].touched && f['dui'].errors?.['required']) {
+              <div class="text-danger small mt-1">El DUI es requerido</div>
+            }
+            @if (f['dui'].touched && f['dui'].errors?.['pattern']) {
+              <div class="text-danger small mt-1">Formato de DUI inválido (Ej: 12345678-9)</div>
+            }
+          </div>
+
+          <div class="d-grid mb-3">
+            <button type="submit" class="btn btn-primary btn-lg" [disabled]="loading()">
+              @if (loading()) {
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                Procesando...
+              } @else {
+                <i class="bi bi-send me-2"></i>
+                Solicitar Activación
+              }
+            </button>
+          </div>
+
+          <div class="text-center">
+            <a routerLink="/auth/login" class="text-decoration-none">
+              <i class="bi bi-arrow-left me-1"></i>
+              Volver al Login
+            </a>
+          </div>
+        </form>
+      }
+    </div>
   </div>
 </div>

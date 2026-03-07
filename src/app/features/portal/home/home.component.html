@@ -1,95 +1,113 @@
-<div class="row mb-4">
-  <div class="col">
-    <h2>
-      <i class="bi bi-house me-2"></i>
-      Bienvenido, {{ cliente()?.nombre }}
-    </h2>
-    <p class="text-muted">Gestiona tu cuenta y revisa tu información desde aquí.</p>
+<!-- Header con avatar -->
+<div class="portal-home-header">
+  <div class="portal-avatar">{{ inicialNombre }}</div>
+  <div>
+    <h2 class="portal-greeting">Hola, {{ cliente()?.nombre }}</h2>
+    <p class="portal-greeting-sub">Gestiona tu cuenta desde aquí</p>
   </div>
 </div>
 
-<div class="row g-4">
-  <!-- Card Perfil -->
-  <div class="col-md-6 col-lg-4">
-    <div class="card h-100 border-primary">
-      <div class="card-body text-center">
-        <i class="bi bi-person-circle display-4 text-primary mb-3"></i>
-        <h5 class="card-title">Mi Perfil</h5>
-        <p class="card-text text-muted">
-          Revisa y consulta tu información personal.
-        </p>
-        <a routerLink="/portal/perfil" class="btn btn-primary">
-          <i class="bi bi-arrow-right me-1"></i>
-          Ver Perfil
-        </a>
-      </div>
+<!-- Action cards táctiles -->
+<div class="portal-actions">
+  <a routerLink="/portal/perfil" class="portal-action-card">
+    <div class="portal-action-icon portal-action-icon--primary">
+      <i class="bi bi-person"></i>
     </div>
-  </div>
+    <div class="portal-action-text">
+      <span class="portal-action-title">Mi Perfil</span>
+      <span class="portal-action-desc">Consulta tu información personal</span>
+    </div>
+    <i class="bi bi-chevron-right portal-action-arrow"></i>
+  </a>
 
-  <!-- Card Seguridad -->
-  <div class="col-md-6 col-lg-4">
-    <div class="card h-100 border-success">
-      <div class="card-body text-center">
-        <i class="bi bi-shield-lock display-4 text-success mb-3"></i>
-        <h5 class="card-title">Seguridad</h5>
-        <p class="card-text text-muted">
-          Cambia tu contraseña para mantener tu cuenta segura.
-        </p>
-        <a routerLink="/portal/cambiar-password" class="btn btn-success">
-          <i class="bi bi-key me-1"></i>
-          Cambiar Contraseña
-        </a>
-      </div>
+  <a routerLink="/portal/contratos" class="portal-action-card">
+    <div class="portal-action-icon portal-action-icon--warning">
+      <i class="bi bi-file-earmark-text"></i>
     </div>
-  </div>
+    <div class="portal-action-text">
+      <span class="portal-action-title">Mis Contratos</span>
+      <span class="portal-action-desc">Consulta tus contratos y facturas</span>
+    </div>
+    <i class="bi bi-chevron-right portal-action-arrow"></i>
+  </a>
 
-  <!-- Card Sesiones -->
-  <div class="col-md-6 col-lg-4">
-    <div class="card h-100 border-info">
-      <div class="card-body text-center">
-        <i class="bi bi-laptop display-4 text-info mb-3"></i>
-        <h5 class="card-title">Mis Sesiones</h5>
-        <p class="card-text text-muted">
-          Administra los dispositivos donde has iniciado sesión.
-        </p>
-        <a routerLink="/portal/sesiones" class="btn btn-info text-white">
-          <i class="bi bi-list me-1"></i>
-          Ver Sesiones
-        </a>
-      </div>
+  <a routerLink="/portal/cambiar-password" class="portal-action-card">
+    <div class="portal-action-icon portal-action-icon--success">
+      <i class="bi bi-shield-lock"></i>
     </div>
-  </div>
+    <div class="portal-action-text">
+      <span class="portal-action-title">Seguridad</span>
+      <span class="portal-action-desc">Cambia tu contraseña</span>
+    </div>
+    <i class="bi bi-chevron-right portal-action-arrow"></i>
+  </a>
+
+  <a routerLink="/portal/sesiones" class="portal-action-card">
+    <div class="portal-action-icon portal-action-icon--info">
+      <i class="bi bi-laptop"></i>
+    </div>
+    <div class="portal-action-text">
+      <span class="portal-action-title">Mis Sesiones</span>
+      <span class="portal-action-desc">Administra tus dispositivos</span>
+    </div>
+    <i class="bi bi-chevron-right portal-action-arrow"></i>
+  </a>
 </div>
 
-<!-- Información rápida -->
-<div class="row mt-5">
-  <div class="col">
-    <div class="card">
-      <div class="card-header bg-light">
-        <h5 class="mb-0">
-          <i class="bi bi-info-circle me-2"></i>
-          Información de tu cuenta
-        </h5>
+<!-- Mis Servicios -->
+@if (!contratosLoading() && contratos().length > 0) {
+  <div class="portal-info-section">
+    <h3 class="portal-info-title">Mis Servicios</h3>
+    <div class="portal-servicios">
+      @for (contrato of contratos(); track contrato.idContrato) {
+        <a [routerLink]="['/portal/contratos', contrato.idContrato]" class="portal-servicio-card">
+          <div class="portal-servicio-icon">
+            <i class="bi bi-router"></i>
+          </div>
+          <div class="portal-servicio-body">
+            <span class="portal-servicio-plan">{{ contrato.plan.nombre }}</span>
+            @if (contrato.plan.velocidadBajada) {
+              <span class="portal-servicio-speed">
+                <i class="bi bi-speedometer2"></i>
+                {{ contrato.plan.velocidadBajada }}/{{ contrato.plan.velocidadSubida }} Mbps
+              </span>
+            }
+          </div>
+          <div class="portal-servicio-meta">
+            <span class="portal-servicio-price">${{ contrato.plan.precio | number:'1.2-2' }}</span>
+            <span class="portal-servicio-badge" [class]="getServicioBadgeClass(contrato.estado)">
+              {{ formatEstado(contrato.estado) }}
+            </span>
+          </div>
+        </a>
+      }
+    </div>
+  </div>
+}
+
+<!-- Información de cuenta -->
+<div class="portal-info-section">
+  <h3 class="portal-info-title">Mi Cuenta</h3>
+  <div class="portal-info-card">
+    <div class="portal-info-row">
+      <i class="bi bi-person-vcard"></i>
+      <div>
+        <span class="portal-info-label">Nombre completo</span>
+        <span class="portal-info-value">{{ cliente()?.nombre }} {{ cliente()?.apellido }}</span>
       </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-6">
-            <p class="mb-2">
-              <strong>Nombre completo:</strong><br>
-              {{ cliente()?.nombre }} {{ cliente()?.apellido }}
-            </p>
-            <p class="mb-2">
-              <strong>DUI:</strong><br>
-              {{ cliente()?.dui }}
-            </p>
-          </div>
-          <div class="col-md-6">
-            <p class="mb-2">
-              <strong>Correo electrónico:</strong><br>
-              {{ cliente()?.correo_electronico }}
-            </p>
-          </div>
-        </div>
+    </div>
+    <div class="portal-info-row">
+      <i class="bi bi-card-text"></i>
+      <div>
+        <span class="portal-info-label">DUI</span>
+        <span class="portal-info-value">{{ cliente()?.dui }}</span>
+      </div>
+    </div>
+    <div class="portal-info-row">
+      <i class="bi bi-envelope"></i>
+      <div>
+        <span class="portal-info-label">Correo electrónico</span>
+        <span class="portal-info-value">{{ cliente()?.correo_electronico }}</span>
       </div>
     </div>
   </div>
