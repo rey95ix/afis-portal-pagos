@@ -76,7 +76,8 @@ export interface FacturaItem {
 
 export interface PagoTarjetaRequest {
   tokenPago: string;
-  idFacturas: number[];
+  idFactura: number;
+  monto: number;
   numeroTarjeta: string;
   cvv2: string;
   fechaExpiracion: string;

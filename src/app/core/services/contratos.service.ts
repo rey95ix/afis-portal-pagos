@@ -30,10 +30,10 @@ export class ContratosService {
     );
   }
 
-  crearPagoIntent(idContrato: number, idFacturas: number[]): Observable<PagoIntentResponse> {
+  crearPagoIntent(idContrato: number, idFactura: number, monto: number): Observable<PagoIntentResponse> {
     return this.http.post<ApiResponse<ApiResponse<PagoIntentResponse>>>(
       `${this.API_URL}/contratos/${idContrato}/pago-intent`,
-      { idFacturas },
+      { idFactura, monto },
     ).pipe(
       map(response => response.data.data)
     );

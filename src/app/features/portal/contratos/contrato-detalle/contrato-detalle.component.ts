@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, effect, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -22,7 +22,6 @@ export class ContratoDetalleComponent implements OnInit {
   facturas = signal<FacturaItem[]>([]);
 
   // Payment state
-  selectedFacturas = signal<Set<number>>(new Set());
   showPaymentForm = signal(false);
   paymentLoading = signal(false);
   paymentResult = signal<PagoTarjetaResponse | null>(null);
@@ -41,14 +40,29 @@ export class ContratoDetalleComponent implements OnInit {
     this.facturas().filter(f => f.saldoPendiente > 0)
   );
 
-  totalAPagar = computed(() => {
-    const selected = this.selectedFacturas();
-    return this.facturas()
-      .filter(f => selected.has(f.idFactura))
-      .reduce((sum, f) => sum + f.saldoPendiente, 0);
+  // Auto-selección: vencida más antigua, o próxima a vencer
+  facturaAutoSeleccionada = computed<FacturaItem | null>(() => {
+    const pendientes = this.facturasConSaldo();
+    if (pendientes.length === 0) return null;
+    const ahora = new Date();
+    // Prioridad 1: vencida más antigua
+    const vencidas = pendientes
+      .filter(f => f.fechaVencimiento && new Date(f.fechaVencimiento) < ahora)
+      .sort((a, b) => new Date(a.fechaVencimiento!).getTime() - new Date(b.fechaVencimiento!).getTime());
+    if (vencidas.length > 0) return vencidas[0];
+    // Prioridad 2: próxima a vencer
+    const futuras = pendientes
+      .filter(f => f.fechaVencimiento)
+      .sort((a, b) => new Date(a.fechaVencimiento!).getTime() - new Date(b.fechaVencimiento!).getTime());
+    return futuras.length > 0 ? futuras[0] : pendientes[0];
   });
 
-  selectedCount = computed(() => this.selectedFacturas().size);
+  montoAPagar = signal<number>(0);
+  montoMaximo = computed(() => this.facturaAutoSeleccionada()?.saldoPendiente ?? 0);
+  montoValido = computed(() => {
+    const m = this.montoAPagar();
+    return m > 0 && m <= this.montoMaximo();
+  });
 
   meses = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'));
   anios: string[] = [];
@@ -59,6 +73,13 @@ export class ContratoDetalleComponent implements OnInit {
     if (/^5[1-5]/.test(num) || /^2[2-7]/.test(num)) return 'MC';
     return '';
   });
+
+  constructor() {
+    effect(() => {
+      const f = this.facturaAutoSeleccionada();
+      if (f) this.montoAPagar.set(f.saldoPendiente);
+    });
+  }
 
   ngOnInit(): void {
     const currentYear = new Date().getFullYear()-1;
@@ -100,45 +121,23 @@ export class ContratoDetalleComponent implements OnInit {
     });
   }
 
-  toggleFactura(idFactura: number): void {
-    const current = new Set(this.selectedFacturas());
-    if (current.has(idFactura)) {
-      current.delete(idFactura);
-    } else {
-      current.add(idFactura);
-    }
-    this.selectedFacturas.set(current);
-  }
-
-  isSelected(idFactura: number): boolean {
-    return this.selectedFacturas().has(idFactura);
-  }
-
-  selectAllPending(): void {
-    const allPending = this.facturasConSaldo().map(f => f.idFactura);
-    const current = this.selectedFacturas();
-    if (current.size === allPending.length) {
-      this.selectedFacturas.set(new Set());
-    } else {
-      this.selectedFacturas.set(new Set(allPending));
-    }
-  }
-
-  allPendingSelected(): boolean {
-    const pending = this.facturasConSaldo();
-    return pending.length > 0 && this.selectedFacturas().size === pending.length;
+  onMontoChange(value: string): void {
+    const num = parseFloat(value);
+    this.montoAPagar.set(isNaN(num) ? 0 : Math.round(num * 100) / 100);
   }
 
   openPaymentForm(): void {
     const idContrato = this.contrato()?.idContrato;
-    if (!idContrato || this.selectedFacturas().size === 0) return;
+    const factura = this.facturaAutoSeleccionada();
+    if (!idContrato || !factura || !this.montoValido()) return;
 
     this.intentLoading.set(true);
     this.paymentResult.set(null);
 
     this.contratosService.crearPagoIntent(
       idContrato,
-      Array.from(this.selectedFacturas()),
+      factura.idFactura,
+      this.montoAPagar(),
     ).subscribe({
       next: (intent) => {
         this.paymentToken.set(intent.token);
@@ -160,7 +159,8 @@ export class ContratoDetalleComponent implements OnInit {
   }
 
   submitPayment(): void {
-    if (this.cardForm.invalid || this.selectedFacturas().size === 0 || !this.paymentToken()) return;
+    const factura = this.facturaAutoSeleccionada();
+    if (this.cardForm.invalid || !factura || !this.montoValido() || !this.paymentToken()) return;
 
     this.paymentLoading.set(true);
     const formValue = this.cardForm.value;
@@ -171,7 +171,8 @@ export class ContratoDetalleComponent implements OnInit {
 
     this.contratosService.pagarConTarjeta(idContrato, {
       tokenPago: this.paymentToken()!,
-      idFacturas: Array.from(this.selectedFacturas()),
+      idFactura: factura.idFactura,
+      monto: this.montoAPagar(),
       numeroTarjeta: formValue.numeroTarjeta,
       cvv2: formValue.cvv2,
       fechaExpiracion,
@@ -182,7 +183,6 @@ export class ContratoDetalleComponent implements OnInit {
         this.paymentResult.set(result);
         this.showPaymentForm.set(false);
         this.cardForm.reset();
-        this.selectedFacturas.set(new Set());
         this.paymentToken.set(null);
         // Reload invoices to reflect updated balances
         this.contratosService.getFacturas(idContrato).subscribe({

@@ -215,11 +215,16 @@
     <div class="portal-info-section">
       <h3 class="portal-info-title"><i class="bi bi-credit-card"></i> Pagar con Tarjeta</h3>
       <div class="pago-form-card">
-        <!-- Selected invoices summary -->
+        <!-- Selected invoice summary -->
         <div class="pago-form-summary">
-          <div class="pago-form-summary-label">Facturas seleccionadas: {{ selectedCount() }}</div>
+          @if (facturaAutoSeleccionada(); as factura) {
+            <div class="pago-form-summary-label">
+              {{ factura.esInstalacion ? 'Instalación' : 'Cuota ' + factura.numeroCuota + '/' + factura.totalCuotas }}
+              · Vence: {{ formatDate(factura.fechaVencimiento) }}
+            </div>
+          }
           <div class="pago-form-summary-total">
-            Total a pagar: <strong>${{ totalAPagar() | number:'1.2-2' }}</strong>
+            Total a pagar: <strong>${{ montoAPagar() | number:'1.2-2' }}</strong>
           </div>
         </div>
 
@@ -284,7 +289,7 @@
                 Procesando...
               } @else {
                 <i class="bi bi-lock-fill me-1"></i>
-                Pagar ${{ totalAPagar() | number:'1.2-2' }}
+                Pagar ${{ montoAPagar() | number:'1.2-2' }}
               }
             </button>
           </div>
@@ -297,12 +302,6 @@
   <div class="portal-info-section">
     <div class="portal-info-title-row">
       <h3 class="portal-info-title">Facturas</h3>
-      @if (facturasConSaldo().length > 0 && !showPaymentForm()) {
-        <label class="pago-select-all">
-          <input type="checkbox" [checked]="allPendingSelected()" (change)="selectAllPending()">
-          Seleccionar todas pendientes
-        </label>
-      }
     </div>
 
     @if (facturas().length === 0) {
@@ -317,14 +316,9 @@
       <div class="factura-cards">
         @for (factura of facturas(); track factura.idFactura) {
           <div class="factura-card" [ngClass]="getFacturaCardClass(factura.estadoPago)"
-               [class.factura-card--selected]="isSelected(factura.idFactura)">
+               [class.factura-card--selected]="facturaAutoSeleccionada()?.idFactura === factura.idFactura">
             <div class="factura-card-header">
               <div class="factura-card-header-left">
-                @if (factura.saldoPendiente > 0 && !showPaymentForm()) {
-                  <input type="checkbox" class="factura-checkbox"
-                         [checked]="isSelected(factura.idFactura)"
-                         (change)="toggleFactura(factura.idFactura)">
-                }
                 <div>
                   <div class="factura-card-cuota">
                     @if (factura.esInstalacion) {
@@ -371,9 +365,6 @@
             <table class="table table-hover mb-0">
               <thead class="table-light">
                 <tr>
-                  @if (!showPaymentForm()) {
-                    <th style="width: 40px;"></th>
-                  }
                   <th>Cuota</th>
                   <th>Período</th>
                   <th>Vencimiento</th>
@@ -386,16 +377,7 @@
               </thead>
               <tbody>
                 @for (factura of facturas(); track factura.idFactura) {
-                  <tr [class.table-active]="isSelected(factura.idFactura)">
-                    @if (!showPaymentForm()) {
-                      <td>
-                        @if (factura.saldoPendiente > 0) {
-                          <input type="checkbox" class="form-check-input factura-checkbox"
-                                 [checked]="isSelected(factura.idFactura)"
-                                 (change)="toggleFactura(factura.idFactura)">
-                        }
-                      </td>
-                    }
+                  <tr [class.table-active]="facturaAutoSeleccionada()?.idFactura === factura.idFactura">
                     <td>
                       @if (factura.esInstalacion) {
                         <span class="portal-servicio-badge portal-servicio-badge--activo">Instalación</span>
@@ -430,17 +412,55 @@
     }
   </div>
 
-  <!-- Selection bar (sticky bottom) -->
-  @if (selectedCount() > 0 && !showPaymentForm()) {
-    <div class="pago-selection-bar">
-      <div class="pago-selection-info">
-        <span class="pago-selection-count">{{ selectedCount() }} factura(s) seleccionada(s)</span>
-        <span class="pago-selection-total">Total: <strong>${{ totalAPagar() | number:'1.2-2' }}</strong></span>
-        <small class="pago-selection-note">El pago se aplicara a las facturas mas antiguas primero</small>
+  <!-- Pagar Cuota section -->
+  @if (facturaAutoSeleccionada(); as factura) {
+    @if (!showPaymentForm()) {
+      <div class="portal-info-section">
+        <h3 class="portal-info-title"><i class="bi bi-credit-card"></i> Pagar Cuota</h3>
+        <div class="pago-form-card">
+          <div class="pago-form-summary">
+            <div class="pago-form-summary-label">
+              {{ factura.esInstalacion ? 'Instalación' : 'Cuota ' + factura.numeroCuota + '/' + factura.totalCuotas }}
+              · Vence: {{ formatDate(factura.fechaVencimiento) }}
+            </div>
+            <div class="pago-form-summary-total">
+              Saldo pendiente: <strong>${{ factura.saldoPendiente | number:'1.2-2' }}</strong>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Monto a pagar</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input type="number" class="form-control" step="0.01" min="0.01"
+                     [max]="factura.saldoPendiente"
+                     [value]="montoAPagar()"
+                     (input)="onMontoChange($any($event.target).value)">
+            </div>
+            @if (montoAPagar() > montoMaximo()) {
+              <div class="text-danger mt-1" style="font-size: 0.85rem;">
+                El monto no puede exceder el saldo pendiente (${{ montoMaximo() | number:'1.2-2' }})
+              </div>
+            }
+            @if (montoAPagar() > 0 && montoAPagar() < factura.saldoPendiente) {
+              <div class="text-muted mt-1" style="font-size: 0.85rem;">
+                Se aplicará como abono parcial
+              </div>
+            }
+          </div>
+
+          <button class="btn btn-primary w-100" (click)="openPaymentForm()"
+                  [disabled]="!montoValido() || intentLoading()">
+            @if (intentLoading()) {
+              <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+              Verificando...
+            } @else {
+              <i class="bi bi-credit-card me-1"></i>
+              Pagar ${{ montoAPagar() | number:'1.2-2' }}
+            }
+          </button>
+        </div>
       </div>
-      <button class="btn btn-primary pago-selection-btn" (click)="openPaymentForm()">
-        <i class="bi bi-credit-card me-1"></i> Pagar con Tarjeta
-      </button>
-    </div>
+    }
   }
 }
