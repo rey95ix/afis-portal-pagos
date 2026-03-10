@@ -1586,3 +1586,61 @@ body {
     gap: 0.25rem;
   }
 }
+
+/* ========================================
+   Contrato Detalle — Ciclo inline & Collapsible Details
+   ======================================== */
+
+/* Ciclo inline en hero */
+.contrato-hero-ciclo {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-top: 0.5rem;
+}
+.contrato-hero-ciclo i {
+  color: #667eea;
+  margin-right: 0.25rem;
+}
+
+/* Toggle detalles */
+.contrato-detalles-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.875rem 1.25rem;
+  background: #fff;
+  border: none;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #495057;
+  transition: background 0.15s;
+}
+.contrato-detalles-toggle:hover {
+  background: #f8f9fa;
+}
+.contrato-detalles-toggle i {
+  transition: transform 0.3s ease;
+  color: #667eea;
+}
+
+/* Collapse body */
+.contrato-detalles-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease;
+}
+.contrato-detalles-body--open {
+  max-height: 600px;
+}
+
+.contrato-detalles-content {
+  padding-top: 0.75rem;
+}
+
+.contrato-detalles-content .portal-info-card {
+  margin-bottom: 0;
+}

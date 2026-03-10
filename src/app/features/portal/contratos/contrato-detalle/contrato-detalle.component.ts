@@ -21,6 +21,9 @@ export class ContratoDetalleComponent implements OnInit {
   contrato = signal<ContratoDetalle | null>(null);
   facturas = signal<FacturaItem[]>([]);
 
+  // UI state
+  showDetalles = signal(false);
+
   // Payment state
   showPaymentForm = signal(false);
   paymentLoading = signal(false);
@@ -199,6 +202,10 @@ export class ContratoDetalleComponent implements OnInit {
         this.showPaymentForm.set(false);
       }
     });
+  }
+
+  toggleDetalles(): void {
+    this.showDetalles.update(v => !v);
   }
 
   dismissResult(): void {
