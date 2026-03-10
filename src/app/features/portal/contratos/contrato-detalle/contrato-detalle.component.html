@@ -184,6 +184,9 @@
             @if (result.terminacionTarjeta) {
               <span><strong>Tarjeta:</strong> ****{{ result.terminacionTarjeta }}</span>
             }
+            @if (result.fechaTransaccion) {
+              <span><strong>Fecha:</strong> {{ formatPaywayDate(result.fechaTransaccion) }}</span>
+            }
             @if (result.distribucion) {
               <span><strong>Monto:</strong> ${{ result.distribucion.montoDistribuido | number:'1.2-2' }}</span>
             }

@@ -75,6 +75,7 @@ export interface FacturaItem {
 }
 
 export interface PagoTarjetaRequest {
+  tokenPago: string;
   idFacturas: number[];
   numeroTarjeta: string;
   cvv2: string;
@@ -82,11 +83,18 @@ export interface PagoTarjetaRequest {
   nombreTarjetahabiente: string;
 }
 
+export interface PagoIntentResponse {
+  token: string;
+  montoEsperado: number;
+  expiraEn: number; // minutos
+}
+
 export interface PagoTarjetaResponse {
   exitoso: boolean;
   mensaje: string;
   numeroAutorizacion?: string;
   terminacionTarjeta?: string;
+  fechaTransaccion?: string;
   distribucion?: {
     items: Array<{
       idFactura: number;

@@ -26,6 +26,8 @@ export class ContratoDetalleComponent implements OnInit {
   showPaymentForm = signal(false);
   paymentLoading = signal(false);
   paymentResult = signal<PagoTarjetaResponse | null>(null);
+  paymentToken = signal<string | null>(null);
+  intentLoading = signal(false);
 
   cardForm: FormGroup = this.fb.group({
     numeroTarjeta: ['', [Validators.required, Validators.pattern(/^\d{13,19}$/)]],
@@ -128,17 +130,37 @@ export class ContratoDetalleComponent implements OnInit {
   }
 
   openPaymentForm(): void {
-    this.showPaymentForm.set(true);
+    const idContrato = this.contrato()?.idContrato;
+    if (!idContrato || this.selectedFacturas().size === 0) return;
+
+    this.intentLoading.set(true);
     this.paymentResult.set(null);
+
+    this.contratosService.crearPagoIntent(
+      idContrato,
+      Array.from(this.selectedFacturas()),
+    ).subscribe({
+      next: (intent) => {
+        this.paymentToken.set(intent.token);
+        this.showPaymentForm.set(true);
+        this.intentLoading.set(false);
+      },
+      error: (err) => {
+        this.intentLoading.set(false);
+        const mensaje = err?.error?.data?.message || err?.error?.message || 'Error al iniciar el proceso de pago';
+        this.paymentResult.set({ exitoso: false, mensaje });
+      },
+    });
   }
 
   cancelPayment(): void {
     this.showPaymentForm.set(false);
     this.cardForm.reset();
+    this.paymentToken.set(null);
   }
 
   submitPayment(): void {
-    if (this.cardForm.invalid || this.selectedFacturas().size === 0) return;
+    if (this.cardForm.invalid || this.selectedFacturas().size === 0 || !this.paymentToken()) return;
 
     this.paymentLoading.set(true);
     const formValue = this.cardForm.value;
@@ -148,6 +170,7 @@ export class ContratoDetalleComponent implements OnInit {
     if (!idContrato) return;
 
     this.contratosService.pagarConTarjeta(idContrato, {
+      tokenPago: this.paymentToken()!,
       idFacturas: Array.from(this.selectedFacturas()),
       numeroTarjeta: formValue.numeroTarjeta,
       cvv2: formValue.cvv2,
@@ -160,6 +183,7 @@ export class ContratoDetalleComponent implements OnInit {
         this.showPaymentForm.set(false);
         this.cardForm.reset();
         this.selectedFacturas.set(new Set());
+        this.paymentToken.set(null);
         // Reload invoices to reflect updated balances
         this.contratosService.getFacturas(idContrato).subscribe({
           next: (data) => this.facturas.set(data),
@@ -219,6 +243,17 @@ export class ContratoDetalleComponent implements OnInit {
 
   formatEstado(estado: string): string {
     return estado.replace(/_/g, ' ');
+  }
+
+  formatPaywayDate(raw: string): string {
+    if (!raw || raw.length < 14) return raw || '';
+    const y = +raw.slice(0, 4), m = +raw.slice(4, 6) - 1, d = +raw.slice(6, 8);
+    const h = +raw.slice(8, 10), min = +raw.slice(10, 12);
+    const date = new Date(y, m, d, h, min);
+    return date.toLocaleDateString('es-SV', {
+      day: 'numeric', month: 'short', year: 'numeric',
+      hour: 'numeric', minute: '2-digit', hour12: true,
+    });
   }
 
   formatDate(dateString: string | null): string {

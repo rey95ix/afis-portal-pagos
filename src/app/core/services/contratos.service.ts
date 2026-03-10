@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models';
-import { ContratoResumen, ContratoDetalle, FacturaItem, PagoTarjetaRequest, PagoTarjetaResponse } from '../models';
+import { ContratoResumen, ContratoDetalle, FacturaItem, PagoTarjetaRequest, PagoTarjetaResponse, PagoIntentResponse } from '../models';
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +26,15 @@ export class ContratosService {
 
   getFacturas(idContrato: number): Observable<FacturaItem[]> {
     return this.http.get<ApiResponse<ApiResponse<FacturaItem[]>>>(`${this.API_URL}/contratos/${idContrato}/facturas`).pipe(
+      map(response => response.data.data)
+    );
+  }
+
+  crearPagoIntent(idContrato: number, idFacturas: number[]): Observable<PagoIntentResponse> {
+    return this.http.post<ApiResponse<ApiResponse<PagoIntentResponse>>>(
+      `${this.API_URL}/contratos/${idContrato}/pago-intent`,
+      { idFacturas },
+    ).pipe(
       map(response => response.data.data)
     );
   }
