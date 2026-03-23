@@ -39,6 +39,7 @@ export class ContratosComponent implements OnInit {
   getServicioBadgeClass(estado: string): string {
     const map: Record<string, string> = {
       'ACTIVO': 'portal-servicio-badge--activo',
+      'INSTALADO_ACTIVO': 'portal-servicio-badge--activo',
       'EN_MORA': 'portal-servicio-badge--mora',
       'REDUCIDO': 'portal-servicio-badge--warning',
       'SUSPENDIDO': 'portal-servicio-badge--default',

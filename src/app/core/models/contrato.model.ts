@@ -38,6 +38,9 @@ export interface ContratoDetalle {
     tipoPlan: string;
     tipoServicio: string;
   };
+  cliente:{
+    titular: string;
+  };
   ciclo: {
     nombre: string;
     diaCorte: number;

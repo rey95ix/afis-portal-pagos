@@ -1,0 +1,212 @@
+/* Mobile-first: base styles for phones (375px+) */
+
+.firma-container {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: #1B2C56;
+  padding: 0.5rem;
+  padding-top: 0.75rem;
+  padding-bottom: 5rem;
+}
+
+.firma-card {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 0.875rem;
+  width: 100%;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Contract info */
+.contrato-info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0.375rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.contrato-info-item:last-child {
+  border-bottom: none;
+}
+
+.contrato-info-label {
+  font-size: 0.75rem;
+  color: #6c757d;
+  flex-shrink: 0;
+  margin-right: 0.5rem;
+}
+
+.contrato-info-value {
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-align: right;
+}
+
+/* PDF button */
+.btn-ver-pdf {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.625rem;
+  border: 1px dashed #6c757d;
+  border-radius: 0.5rem;
+  background: #f8f9fa;
+  color: #495057;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-ver-pdf:hover,
+.btn-ver-pdf:active {
+  background: #e9ecef;
+}
+
+/* PDF inline (hidden on mobile, shown on desktop) */
+.pdf-container {
+  display: none;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.pdf-iframe {
+  width: 100%;
+  height: 400px;
+  border: none;
+}
+
+/* Signature pad */
+.signature-wrapper {
+  border: 2px solid #1B2C56;
+  border-radius: 0.5rem;
+  background: #fff;
+  overflow: hidden;
+  position: relative;
+}
+
+.signature-canvas {
+  display: block;
+  width: 100%;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.signature-placeholder {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #c0c0c0;
+  font-size: 0.875rem;
+  pointer-events: none;
+  text-align: center;
+}
+
+/* Sticky footer for sign button */
+.firma-action-sticky {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  padding: 0.75rem;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+.firma-action-sticky .btn {
+  font-size: 1.1rem;
+  padding: 0.75rem;
+  font-weight: 600;
+}
+
+/* Loading state */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+/* Error state */
+.error-icon {
+  font-size: 2.5rem;
+}
+
+/* Success state */
+.success-icon {
+  font-size: 3rem;
+}
+
+/* Títulos compactos */
+.section-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+/* Limpiar firma - botón compacto */
+.btn-limpiar {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.625rem;
+}
+
+/* ============================================
+   Desktop/Tablet: mejoras progresivas (576px+)
+   ============================================ */
+@media (min-width: 576px) {
+  .firma-container {
+    padding: 1.5rem;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .firma-card {
+    max-width: 600px;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  .pdf-container {
+    display: block;
+  }
+
+  .btn-ver-pdf {
+    display: none;
+  }
+
+  .firma-action-sticky {
+    position: static;
+    background: transparent;
+    padding: 0;
+    box-shadow: none;
+    max-width: 600px;
+    width: 100%;
+  }
+
+  .firma-action-sticky .firma-card {
+    max-width: 100%;
+  }
+
+  .error-icon {
+    font-size: 3rem;
+  }
+
+  .success-icon {
+    font-size: 4rem;
+  }
+}

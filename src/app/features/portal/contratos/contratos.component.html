@@ -28,16 +28,16 @@
     @for (contrato of contratos(); track contrato.idContrato) {
       <a [routerLink]="['/portal/contratos', contrato.idContrato]" class="contrato-card">
         <div class="contrato-card-icon">
-          <i class="bi bi-router"></i>
+          <i class="bi bi-router text-primary"></i>
         </div>
         <div class="contrato-card-body">
           <span class="contrato-card-plan">{{ contrato.plan.nombre }}</span>
           <span class="contrato-card-info">
             @if (contrato.plan.velocidadBajada) {
-              <i class="bi bi-speedometer2"></i>
+              <i class="bi bi-speedometer2 text-primary"></i>
               {{ contrato.plan.velocidadBajada }}/{{ contrato.plan.velocidadSubida }} Mbps
             }
-            · {{ contrato.ciclo.nombre }}
+            Vence día {{ contrato.ciclo.diaVencimiento }}
           </span>
         </div>
         <div class="contrato-card-meta">

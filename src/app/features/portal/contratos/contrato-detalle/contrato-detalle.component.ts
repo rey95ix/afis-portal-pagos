@@ -220,6 +220,7 @@ export class ContratoDetalleComponent implements OnInit {
   getServicioBadgeClass(estado: string): string {
     const map: Record<string, string> = {
       'ACTIVO': 'portal-servicio-badge--activo',
+      'INSTALADO_ACTIVO': 'portal-servicio-badge--activo',
       'EN_MORA': 'portal-servicio-badge--mora',
       'REDUCIDO': 'portal-servicio-badge--warning',
       'SUSPENDIDO': 'portal-servicio-badge--default',
@@ -230,6 +231,7 @@ export class ContratoDetalleComponent implements OnInit {
   getEstadoPagoBadgeClass(estado: string): string {
     const map: Record<string, string> = {
       'PAGADO': 'portal-servicio-badge--activo',
+      'INSTALADO_ACTIVO': 'portal-servicio-badge--activo',
       'PENDIENTE': 'portal-servicio-badge--warning',
       'PARCIAL': 'portal-servicio-badge--default',
       'VENCIDA': 'portal-servicio-badge--mora',
@@ -270,6 +272,14 @@ export class ContratoDetalleComponent implements OnInit {
       month: 'short',
       day: 'numeric'
     });
+  }
+
+  formatMesPeriodo(inicio: string | null): string {
+    if (!inicio) return '-';
+    const d = new Date(inicio);
+    const mes = d.toLocaleDateString('es-SV', { month: 'long' });
+    const anio = d.getFullYear();
+    return `${mes.charAt(0).toUpperCase() + mes.slice(1)} ${anio}`;
   }
 
   formatPeriodo(inicio: string | null, fin: string | null): string {

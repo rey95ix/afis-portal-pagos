@@ -69,7 +69,7 @@ export class CambiarPasswordComponent {
           icon: 'success',
           title: 'Contraseña Actualizada',
           text: 'Tu contraseña ha sido cambiada exitosamente.',
-          confirmButtonColor: '#0d6efd'
+          confirmButtonColor: '#1B2C56'
         }).then(() => {
           this.router.navigate(['/portal/contratos']);
         });
@@ -81,7 +81,7 @@ export class CambiarPasswordComponent {
           icon: 'error',
           title: 'Error',
           text: message,
-          confirmButtonColor: '#0d6efd'
+          confirmButtonColor: '#1B2C56'
         });
       }
     });

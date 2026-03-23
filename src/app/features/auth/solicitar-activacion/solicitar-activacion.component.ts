@@ -38,7 +38,7 @@ export class SolicitarActivacionComponent {
           icon: 'success',
           title: 'Solicitud Enviada',
           text: response.message,
-          confirmButtonColor: '#0d6efd'
+          confirmButtonColor: '#1B2C56'
         });
       },
       error: (error) => {
@@ -48,7 +48,7 @@ export class SolicitarActivacionComponent {
           icon: 'error',
           title: 'Error',
           text: message,
-          confirmButtonColor: '#0d6efd'
+          confirmButtonColor: '#1B2C56'
         });
       }
     });

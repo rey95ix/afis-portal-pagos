@@ -1,0 +1,137 @@
+<div class="firma-container">
+  <!-- Loading -->
+  <div *ngIf="state() === 'loading'" class="loading-state">
+    <div class="spinner-border text-white mb-3" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="text-white-50 small">Validando enlace...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="state() === 'error'" class="firma-card text-center">
+    <i class="bi bi-exclamation-triangle-fill text-danger error-icon"></i>
+    <h5 class="mt-2 mb-1">No se puede firmar</h5>
+    <p class="text-muted small mb-3">{{ errorMessage() }}</p>
+    <a href="/" class="btn btn-outline-secondary btn-sm">Ir al inicio</a>
+  </div>
+
+  <!-- Ready / Signing -->
+  <ng-container *ngIf="state() === 'ready' || state() === 'signing'">
+    <!-- Contract Info -->
+    <div class="firma-card mb-2">
+      <div class="section-title">
+        <i class="bi bi-file-earmark-text text-primary"></i>
+        Datos del Contrato
+      </div>
+
+      <div *ngIf="contrato()">
+        <div class="contrato-info-item">
+          <span class="contrato-info-label">Contrato</span>
+          <span class="contrato-info-value">{{ contrato().codigo }}</span>
+        </div>
+        <div class="contrato-info-item">
+          <span class="contrato-info-label">Cliente</span>
+          <span class="contrato-info-value">{{ contrato().cliente_nombre }}</span>
+        </div>
+        <div class="contrato-info-item">
+          <span class="contrato-info-label">Plan</span>
+          <span class="contrato-info-value">
+            {{ contrato().plan_nombre }}
+            <span *ngIf="contrato().plan_precio" class="text-muted fw-normal"> - ${{ contrato().plan_precio }}/mes</span>
+          </span>
+        </div>
+        <div class="contrato-info-item">
+          <span class="contrato-info-label">Dirección</span>
+          <span class="contrato-info-value">{{ contrato().direccion }}, {{ contrato().municipio }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error message (non-fatal) -->
+    <div *ngIf="errorMessage() && state() === 'ready'" class="alert alert-danger py-2 px-3 mb-2 small">
+      <i class="bi bi-exclamation-circle me-1"></i>{{ errorMessage() }}
+    </div>
+
+    <!-- PDF: button on mobile, iframe on desktop -->
+    <div class="firma-card mb-2">
+      <div class="section-title">
+        <i class="bi bi-file-pdf text-danger"></i>
+        Contrato
+      </div>
+
+      <!-- Mobile: button to open PDF -->
+      <button *ngIf="safePdfUrl()" class="btn-ver-pdf" (click)="verPdf()">
+        <i class="bi bi-box-arrow-up-right"></i>
+        Ver Contrato PDF
+      </button>
+
+      <!-- Desktop: inline iframe -->
+      <div *ngIf="safePdfUrl()" class="pdf-container">
+        <iframe [src]="safePdfUrl()" class="pdf-iframe" title="Contrato PDF"></iframe>
+      </div>
+
+      <!-- PDF loading -->
+      <div *ngIf="!safePdfUrl() && !pdfError()" class="text-center py-2">
+        <div class="spinner-border spinner-border-sm text-muted" role="status"></div>
+        <small class="text-muted ms-2">Cargando documento...</small>
+      </div>
+
+      <!-- PDF error -->
+      <div *ngIf="pdfError() && !safePdfUrl()" class="text-center py-2">
+        <small class="text-muted">
+          <i class="bi bi-exclamation-triangle me-1"></i>No se pudo cargar el documento.
+        </small>
+      </div>
+    </div>
+
+    <!-- Signature Pad -->
+    <div class="firma-card mb-2">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="section-title mb-0">
+          <i class="bi bi-pen text-primary"></i>
+          Firme aquí
+        </div>
+        <button class="btn btn-outline-secondary btn-limpiar" (click)="limpiarFirma()" [disabled]="state() === 'signing'">
+          <i class="bi bi-eraser me-1"></i>Limpiar
+        </button>
+      </div>
+      <div class="signature-wrapper">
+        <canvas #signatureCanvas class="signature-canvas"></canvas>
+      </div>
+      <p class="text-muted text-center mt-1 mb-0" style="font-size: 0.7rem;">
+        Use su dedo para firmar en el recuadro
+      </p>
+    </div>
+
+    <!-- Spacer for sticky button on mobile -->
+    <div style="height: 1rem;"></div>
+
+    <!-- Action: sticky on mobile, normal on desktop -->
+    <div class="firma-action-sticky">
+      <div class="firma-card">
+        <button
+          class="btn btn-primary w-100"
+          (click)="firmar()"
+          [disabled]="state() === 'signing' || isFirmaVacia"
+        >
+          <span *ngIf="state() === 'signing'" class="spinner-border spinner-border-sm me-2"></span>
+          {{ state() === 'signing' ? 'Procesando...' : 'Firmar Contrato' }}
+        </button>
+        <p class="text-muted text-center mb-0 mt-1" style="font-size: 0.65rem;">
+          Al firmar, acepta los términos y condiciones del contrato.
+        </p>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Success -->
+  <div *ngIf="state() === 'success'" class="firma-card text-center">
+    <i class="bi bi-check-circle-fill text-success success-icon"></i>
+    <h5 class="mt-2 mb-1">Contrato Firmado</h5>
+    <p class="text-muted small mb-2">Su contrato ha sido firmado exitosamente. Pronto coordinaremos la instalación.</p>
+    <div class="alert alert-light border py-2 mb-0 small">
+      <i class="bi bi-info-circle me-1"></i>
+      Puede cerrar esta ventana.
+    </div>
+  </div>
+</div>

@@ -40,7 +40,7 @@ export class ResetPasswordComponent implements OnInit {
           icon: 'error',
           title: 'Token no válido',
           text: 'El enlace de recuperación no es válido o ha expirado.',
-          confirmButtonColor: '#0d6efd'
+          confirmButtonColor: '#1B2C56'
         }).then(() => {
           this.router.navigate(['/auth/login']);
         });
@@ -88,7 +88,7 @@ export class ResetPasswordComponent implements OnInit {
           icon: 'success',
           title: 'Contraseña Actualizada',
           text: 'Tu contraseña ha sido restablecida exitosamente.',
-          confirmButtonColor: '#0d6efd'
+          confirmButtonColor: '#1B2C56'
         }).then(() => {
           this.router.navigate(['/auth/login']);
         });
@@ -100,7 +100,7 @@ export class ResetPasswordComponent implements OnInit {
           icon: 'error',
           title: 'Error',
           text: message,
-          confirmButtonColor: '#0d6efd'
+          confirmButtonColor: '#1B2C56'
         });
       }
     });

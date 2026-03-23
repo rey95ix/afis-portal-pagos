@@ -67,6 +67,12 @@ export const routes: Routes = [
     ]
   },
 
+  // Ruta pública para firma de contrato (no requiere autenticación)
+  {
+    path: 'firmar-contrato/:token',
+    loadComponent: () => import('./features/firma-contrato/firmar-contrato.component').then(m => m.FirmarContratoComponent)
+  },
+
   // Ruta comodín
   { path: '**', redirectTo: 'auth/login' }
 ];

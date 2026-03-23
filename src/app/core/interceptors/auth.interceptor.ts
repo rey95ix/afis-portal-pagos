@@ -13,7 +13,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     '/solicitar-activacion',
     '/activar-cuenta',
     '/forgot-password',
-    '/reset-password'
+    '/reset-password',
+    '/firma-contrato'
   ];
 
   const isPublicEndpoint = publicEndpoints.some(endpoint => req.url.includes(endpoint));

@@ -40,7 +40,7 @@ export class ActivarCuentaComponent implements OnInit {
           icon: 'error',
           title: 'Token no válido',
           text: 'El enlace de activación no es válido o ha expirado.',
-          confirmButtonColor: '#0d6efd'
+          confirmButtonColor: '#1B2C56'
         }).then(() => {
           this.router.navigate(['/auth/login']);
         });
@@ -88,7 +88,7 @@ export class ActivarCuentaComponent implements OnInit {
           icon: 'success',
           title: 'Cuenta Activada',
           text: 'Tu cuenta ha sido activada exitosamente. Ya puedes iniciar sesión.',
-          confirmButtonColor: '#0d6efd'
+          confirmButtonColor: '#1B2C56'
         }).then(() => {
           this.router.navigate(['/auth/login']);
         });
@@ -100,7 +100,7 @@ export class ActivarCuentaComponent implements OnInit {
           icon: 'error',
           title: 'Error',
           text: message,
-          confirmButtonColor: '#0d6efd'
+          confirmButtonColor: '#1B2C56'
         });
       }
     });

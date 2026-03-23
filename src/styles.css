@@ -16,7 +16,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #1B2C56;
   padding: 1rem;
 }
 
@@ -31,8 +31,8 @@ body {
 
 /* Mejoras para inputs */
 .form-control:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+  border-color: #1B2C56;
+  box-shadow: 0 0 0 0.2rem rgba(27, 44, 86, 0.25);
 }
 
 .input-group-text {
@@ -45,18 +45,18 @@ body {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #1B2C56;
   border: none;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #5a6fd6 0%, #6a4190 100%);
+  background: #151f3d;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(27, 44, 86, 0.4);
 }
 
 .btn-primary:disabled {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #1B2C56;
   opacity: 0.7;
 }
 
@@ -166,7 +166,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #1B2C56;
   color: white;
   padding: 3rem 2rem;
   position: relative;
@@ -201,6 +201,35 @@ body {
   z-index: 1;
   text-align: center;
   max-width: 380px;
+}
+
+/* Logo base */
+.auth-brand-logo {
+  width: 60%;
+  max-width: 220px;
+  background: white;
+  border-radius: 16px;
+  padding: 0.75rem;
+  margin: 0 auto 1.5rem;
+  display: block;
+  object-fit: contain;
+}
+
+/* Desktop: solo el del panel izquierdo */
+.auth-brand-logo--mobile {
+  display: none;
+}
+
+/* Móvil: solo el del formulario */
+@media (max-width: 575.98px) {
+  .auth-brand-logo--desktop {
+    display: none;
+  }
+  .auth-brand-logo--mobile {
+    display: block;
+    margin: 0 auto;
+    padding: 0;
+  }
 }
 
 .auth-brand-content h1 {
@@ -428,6 +457,10 @@ body {
 }
 
 @media (max-width: 575.98px) {
+  .auth-brand-panel {
+    display: none;
+  }
+
   .auth-brand-illustration {
     width: 110px;
     height: 110px;
@@ -461,10 +494,14 @@ body {
 
   .auth-form-panel {
     padding: 1.5rem 1rem;
+    background: transparent;
   }
 
   .auth-split .auth-card {
-    padding: 1rem 0.5rem;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    border-radius: 25px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   }
 }
 
@@ -588,6 +625,17 @@ body {
   }
 }
 
+/* Portal Layout — sticky footer */
+app-portal-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+app-portal-layout main {
+  flex: 1;
+}
+
 /* ========================================
    Portal Home — Mobile-First
    ======================================== */
@@ -604,7 +652,7 @@ body {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #1B2C56;
   color: #fff;
   font-weight: 700;
   font-size: 1.25rem;
@@ -671,8 +719,8 @@ body {
 }
 
 .portal-action-icon--primary {
-  background: rgba(102, 126, 234, 0.12);
-  color: #667eea;
+  background: rgba(27, 44, 86, 0.12);
+  color: #1B2C56;
 }
 
 .portal-action-icon--success {
@@ -682,7 +730,7 @@ body {
 
 .portal-action-icon--info {
   background: rgba(13, 202, 240, 0.12);
-  color: #0d6efd;
+  color: #1B2C56;
 }
 
 .portal-action-text {
@@ -744,7 +792,7 @@ body {
 
 .portal-info-row > i {
   font-size: 1.1rem;
-  color: #667eea;
+  color: #1B2C56;
   width: 24px;
   text-align: center;
   flex-shrink: 0;
@@ -822,8 +870,8 @@ body {
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: rgba(102, 126, 234, 0.12);
-  color: #667eea;
+  background: rgba(27, 44, 86, 0.12);
+  color: #1B2C56;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -956,8 +1004,8 @@ body {
   width: 48px;
   height: 48px;
   border-radius: 14px;
-  background: rgba(102, 126, 234, 0.12);
-  color: #667eea;
+  background: rgba(27, 44, 86, 0.12);
+  color: #1B2C56;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1047,7 +1095,7 @@ body {
 .contrato-hero-price {
   font-size: 1.6rem;
   font-weight: 700;
-  color: #667eea;
+  color: #1B2C56;
   margin-bottom: 0.25rem;
 }
 
@@ -1063,7 +1111,7 @@ body {
 }
 
 .contrato-hero-speed i {
-  color: #667eea;
+  color: #1B2C56;
   margin-right: 0.25rem;
 }
 
@@ -1181,7 +1229,7 @@ body {
 }
 
 .factura-card-value--highlight {
-  color: #667eea;
+  color: #1B2C56;
   font-weight: 700;
 }
 
@@ -1310,14 +1358,14 @@ body {
 .pago-select-all input[type="checkbox"] {
   width: 16px;
   height: 16px;
-  accent-color: #667eea;
+  accent-color: #1B2C56;
 }
 
 /* Checkbox in factura cards/rows */
 .factura-checkbox {
   width: 18px;
   height: 18px;
-  accent-color: #667eea;
+  accent-color: #1B2C56;
   cursor: pointer;
   flex-shrink: 0;
 }
@@ -1329,8 +1377,8 @@ body {
 }
 
 .factura-card--selected {
-  border-color: #667eea !important;
-  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+  border-color: #1B2C56 !important;
+  box-shadow: 0 0 0 2px rgba(27, 44, 86, 0.2);
 }
 
 /* Selection bar (sticky bottom) */
@@ -1340,7 +1388,7 @@ body {
   left: 0;
   right: 0;
   background: white;
-  border-top: 2px solid #667eea;
+  border-top: 2px solid #1B2C56;
   padding: 0.75rem 1.5rem;
   display: flex;
   align-items: center;
@@ -1598,7 +1646,7 @@ body {
   margin-top: 0.5rem;
 }
 .contrato-hero-ciclo i {
-  color: #667eea;
+  color: #1B2C56;
   margin-right: 0.25rem;
 }
 
@@ -1624,7 +1672,7 @@ body {
 }
 .contrato-detalles-toggle i {
   transition: transform 0.3s ease;
-  color: #667eea;
+  color: #1B2C56;
 }
 
 /* Collapse body */
@@ -1643,4 +1691,55 @@ body {
 
 .contrato-detalles-content .portal-info-card {
   margin-bottom: 0;
+}
+
+/* ============================
+   Modal de Migración
+   ============================ */
+
+.migration-modal .modal-content {
+  border: none;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.migration-modal-header {
+  background: #1B2C56;
+  color: #fff;
+  text-align: center;
+  padding: 1.5rem 1.5rem 1.25rem;
+}
+
+.migration-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+  font-size: 1.5rem;
+}
+
+.migration-success-icon {
+  font-size: 3rem;
+  color: #198754;
+}
+
+.migration-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.75rem 0;
+  color: #adb5bd;
+  font-size: 0.875rem;
+}
+
+.migration-divider::before,
+.migration-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #dee2e6;
 }

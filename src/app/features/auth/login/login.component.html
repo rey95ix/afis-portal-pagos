@@ -14,12 +14,12 @@
           <span class="orbit-icon"><i class="bi bi-shield-check"></i></span>
         </div>
       </div>
-
-      <h1>AFIS</h1>
-      <p class="brand-subtitle">Portal de Clientes</p>
+ 
+      <img src="assets/newtel-logo.png" alt="Newtel Logo" class="auth-brand-logo auth-brand-logo--desktop" />
+      <p class="auth-brand-tagline">Conectando tu mundo con velocidad y confianza</p>
 
       <!-- Feature pills -->
-      <div class="auth-brand-features">
+      <!-- <div class="auth-brand-features">
         <div class="feature-pill">
           <i class="bi bi-speedometer2"></i>
           <span>Consulta tu velocidad</span>
@@ -32,7 +32,7 @@
           <i class="bi bi-headset"></i>
           <span>Soporte 24/7</span>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 
@@ -40,6 +40,7 @@
   <div class="auth-form-panel">
     <div class="auth-card">
       <div class="text-center mb-4">
+      <img src="assets/newtel-logo.png" alt="Newtel Logo" class="auth-brand-logo auth-brand-logo--mobile" />
         <h2 class="auth-welcome-title">Bienvenido</h2>
         <p class="auth-welcome-subtitle">Ingresa tus credenciales para acceder</p>
       </div>
@@ -123,6 +124,89 @@
           </a>
         </div>
       </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Migración -->
+<div class="modal fade migration-modal" #migrationModal tabindex="-1" aria-labelledby="migrationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="migration-modal-header">
+        <div class="migration-icon">
+          <i class="bi bi-megaphone"></i>
+        </div>
+        <h4 class="mb-0" id="migrationModalLabel">¡Nos actualizamos!</h4>
+      </div>
+      <div class="modal-body p-4">
+        @if (activacionEnviado()) {
+          <div class="text-center py-3">
+            <div class="migration-success-icon mb-3">
+              <i class="bi bi-check-circle-fill"></i>
+            </div>
+            <h5 class="mb-2">Solicitud enviada</h5>
+            <p class="text-muted mb-4">
+              Revisa tu correo electrónico para continuar con la activación de tu cuenta.
+            </p>
+            <button type="button" class="btn btn-primary" (click)="cerrarModal()">
+              <i class="bi bi-check-lg me-2"></i>
+              Entendido
+            </button>
+          </div>
+        } @else {
+          <p class="text-muted mb-4">
+            Hemos migrado a una nueva plataforma. Para acceder al portal, todos los clientes deben
+            <strong>activar su cuenta</strong> ingresando su número de DUI.
+          </p>
+
+          <form [formGroup]="activacionForm" (ngSubmit)="onActivacionSubmit()">
+            <div class="mb-3">
+              <label for="modal-dui" class="form-label">Número de DUI</label>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="bi bi-card-text"></i>
+                </span>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="modal-dui"
+                  formControlName="dui"
+                  placeholder="12345678-9"
+                  maxlength="10"
+                  [class.is-invalid]="fa['dui'].touched && fa['dui'].invalid"
+                />
+              </div>
+              @if (fa['dui'].touched && fa['dui'].errors?.['required']) {
+                <div class="text-danger small mt-1">El DUI es requerido</div>
+              }
+              @if (fa['dui'].touched && fa['dui'].errors?.['pattern']) {
+                <div class="text-danger small mt-1">Formato de DUI inválido (Ej: 12345678-9)</div>
+              }
+            </div>
+
+            <div class="d-grid mb-3">
+              <button type="submit" class="btn btn-primary btn-lg" [disabled]="activacionLoading()">
+                @if (activacionLoading()) {
+                  <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                  Procesando...
+                } @else {
+                  <i class="bi bi-send me-2"></i>
+                  Solicitar Activación
+                }
+              </button>
+            </div>
+          </form>
+
+          <div class="text-center">
+            <div class="migration-divider">
+              <span>o</span>
+            </div>
+            <button type="button" class="btn btn-link text-decoration-none" (click)="cerrarModal()">
+              Ya tengo cuenta, iniciar sesión
+            </button>
+          </div>
+        }
+      </div>
     </div>
   </div>
 </div>

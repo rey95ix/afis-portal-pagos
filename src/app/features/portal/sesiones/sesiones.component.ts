@@ -39,7 +39,7 @@ export class SesionesComponent implements OnInit {
         icon: 'warning',
         title: 'No puedes revocar tu sesión actual',
         text: 'Si deseas cerrar esta sesión, usa el botón "Cerrar Sesión".',
-        confirmButtonColor: '#0d6efd'
+        confirmButtonColor: '#1B2C56'
       });
       return;
     }
@@ -61,7 +61,7 @@ export class SesionesComponent implements OnInit {
               icon: 'success',
               title: 'Sesión Revocada',
               text: 'La sesión ha sido cerrada exitosamente.',
-              confirmButtonColor: '#0d6efd'
+              confirmButtonColor: '#1B2C56'
             });
             this.loadSessions();
           },
@@ -71,7 +71,7 @@ export class SesionesComponent implements OnInit {
               icon: 'error',
               title: 'Error',
               text: message,
-              confirmButtonColor: '#0d6efd'
+              confirmButtonColor: '#1B2C56'
             });
           }
         });

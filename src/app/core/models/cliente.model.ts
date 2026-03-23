@@ -15,6 +15,7 @@ export interface ClienteProfile {
   id_cliente: number;
   dui: string;
   nombre: string;
+  titular: string;
   apellido: string;
   correo_electronico: string;
   telefono?: string;

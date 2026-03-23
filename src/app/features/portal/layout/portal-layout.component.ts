@@ -14,7 +14,7 @@ import Swal from 'sweetalert2';
 export class PortalLayoutComponent {
   private authService = inject(AuthService);
   private tokenStorage = inject(TokenStorageService);
-
+  year = new Date().getFullYear();
   cliente = this.tokenStorage.cliente;
   isMenuOpen = signal(false);
 
@@ -28,7 +28,7 @@ export class PortalLayoutComponent {
       text: '¿Estás seguro de que deseas cerrar tu sesión?',
       icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: '#0d6efd',
+      confirmButtonColor: '#1B2C56',
       cancelButtonColor: '#6c757d',
       confirmButtonText: 'Sí, cerrar sesión',
       cancelButtonText: 'Cancelar'

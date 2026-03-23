@@ -17,13 +17,13 @@
 } @else if (contrato(); as c) {
   <!-- Hero -->
   <div class="contrato-hero">
-    <div class="contrato-hero-code">{{ c.codigo }}</div>
+    <div class="contrato-hero-code">{{ c.cliente.titular }}</div>
     <span class="portal-servicio-badge" [class]="getServicioBadgeClass(c.estado)">
       {{ formatEstado(c.estado) }}
     </span>
-    <div class="contrato-hero-plan">{{ c.plan.nombre }}</div>
+    <div class="contrato-hero-plan text-primary">{{ c.plan.nombre }}</div>
     <div class="contrato-hero-type">{{ c.plan.tipoServicio }} · {{ c.plan.tipoPlan }}</div>
-    <div class="contrato-hero-price">
+    <div class="contrato-hero-price text-primary">
       ${{ c.plan.precio | number:'1.2-2' }} <span>/mes</span>
     </div>
     @if (c.plan.velocidadBajada) {
@@ -34,7 +34,7 @@
     }
     <div class="contrato-hero-ciclo">
       <i class="bi bi-arrow-repeat"></i>
-      {{ c.ciclo.nombre }} · Corte día {{ c.ciclo.diaCorte }} · Vence día {{ c.ciclo.diaVencimiento }}
+      Vence día {{ c.ciclo.diaVencimiento }}
     </div>
   </div>
 
@@ -87,10 +87,10 @@
         <div class="pago-form-card">
           <div class="pago-form-summary">
             <div class="pago-form-summary-label">
-              {{ factura.esInstalacion ? 'Instalación' : 'Cuota ' + factura.numeroCuota + '/' + factura.totalCuotas }}
-              · Vence: {{ formatDate(factura.fechaVencimiento) }}
+              {{ factura.esInstalacion ? 'Instalación' :  '' }}
+              Vence: {{ formatDate(factura.fechaVencimiento) }}
             </div>
-            <div class="pago-form-summary-total">
+            <div class="pago-form-summary-total text-primary">
               Saldo pendiente: <strong>${{ factura.saldoPendiente | number:'1.2-2' }}</strong>
             </div>
           </div>
@@ -140,8 +140,8 @@
         <div class="pago-form-summary">
           @if (facturaAutoSeleccionada(); as factura) {
             <div class="pago-form-summary-label">
-              {{ factura.esInstalacion ? 'Instalación' : 'Cuota ' + factura.numeroCuota + '/' + factura.totalCuotas }}
-              · Vence: {{ formatDate(factura.fechaVencimiento) }}
+              {{ factura.esInstalacion ? 'Instalación' :  '' }}
+              Vence: {{ formatDate(factura.fechaVencimiento) }}
             </div>
           }
           <div class="pago-form-summary-total">
@@ -152,7 +152,7 @@
         <form [formGroup]="cardForm" (ngSubmit)="submitPayment()">
           <!-- Cardholder name -->
           <div class="mb-3">
-            <label class="form-label">Nombre del tarjetahabiente</label>
+            <label class="form-label">Nombre del titular</label>
             <input type="text" class="form-control" formControlName="nombreTarjetahabiente"
                    placeholder="Como aparece en la tarjeta" autocomplete="cc-name">
           </div>
@@ -245,10 +245,10 @@
                     @if (factura.esInstalacion) {
                       Instalación
                     } @else {
-                      Cuota {{ factura.numeroCuota }}/{{ factura.totalCuotas }}
+                      {{ formatMesPeriodo(factura.periodoInicio) }}
                     }
                   </div>
-                  <div class="factura-card-periodo">{{ formatPeriodo(factura.periodoInicio, factura.periodoFin) }}</div>
+                  <div class="factura-card-periodo">Vence: {{ formatDate(factura.fechaVencimiento) }}</div>
                 </div>
               </div>
               <span class="portal-servicio-badge" [class]="getEstadoPagoBadgeClass(factura.estadoPago)">
@@ -346,21 +346,21 @@
           <h3 class="portal-info-title">Vigencia</h3>
           <div class="portal-info-card">
             <div class="portal-info-row">
-              <i class="bi bi-calendar2-plus"></i>
+              <i class="bi bi-calendar2-plus text-primary"></i>
               <div>
                 <span class="portal-info-label">Fecha inicio</span>
                 <span class="portal-info-value">{{ formatDate(c.fechaInicioContrato) }}</span>
               </div>
             </div>
             <div class="portal-info-row">
-              <i class="bi bi-calendar2-x"></i>
+              <i class="bi bi-calendar2-x text-primary"></i>
               <div>
                 <span class="portal-info-label">Fecha fin</span>
                 <span class="portal-info-value">{{ formatDate(c.fechaFinContrato) }}</span>
               </div>
             </div>
             <div class="portal-info-row">
-              <i class="bi bi-clock-history"></i>
+              <i class="bi bi-clock-history text-primary"></i>
               <div>
                 <span class="portal-info-label">Duración</span>
                 <span class="portal-info-value">{{ c.mesesContrato }} meses</span>
@@ -374,7 +374,7 @@
           <h3 class="portal-info-title">Dirección de Servicio</h3>
           <div class="portal-info-card">
             <div class="portal-info-row">
-              <i class="bi bi-geo-alt"></i>
+              <i class="bi bi-geo-alt text-primary"></i>
               <div>
                 <span class="portal-info-label">Dirección</span>
                 <span class="portal-info-value">{{ c.direccionServicio.direccion }}</span>
@@ -382,7 +382,7 @@
             </div>
             @if (c.direccionServicio.colonia || c.direccionServicio.municipio) {
               <div class="portal-info-row">
-                <i class="bi bi-building"></i>
+                <i class="bi bi-building text-primary"></i>
                 <div>
                   <span class="portal-info-label">Ubicación</span>
                   <span class="portal-info-value">
@@ -401,7 +401,7 @@
           <div class="portal-info-card">
             @if (c.instalacion) {
               <div class="portal-info-row">
-                <i class="bi bi-check-circle"></i>
+                <i class="bi bi-check-circle text-primary"></i>
                 <div>
                   <span class="portal-info-label">Estado</span>
                   <span class="portal-info-value">{{ c.instalacion.instalado ? 'Instalado' : 'Pendiente' }}</span>
@@ -409,7 +409,7 @@
               </div>
               @if (c.instalacion.fechaInstalacion) {
                 <div class="portal-info-row">
-                  <i class="bi bi-calendar2-check"></i>
+                  <i class="bi bi-calendar2-check text-primary"></i>
                   <div>
                     <span class="portal-info-label">Fecha instalación</span>
                     <span class="portal-info-value">{{ formatDate(c.instalacion.fechaInstalacion) }}</span>
@@ -418,7 +418,7 @@
               }
               @if (c.instalacion.wifiNombre) {
                 <div class="portal-info-row">
-                  <i class="bi bi-wifi"></i>
+                  <i class="bi bi-wifi text-primary"></i>
                   <div>
                     <span class="portal-info-label">Red Wi-Fi</span>
                     <span class="portal-info-value">{{ c.instalacion.wifiNombre }}</span>
@@ -427,7 +427,7 @@
               }
             } @else {
               <div class="portal-info-row">
-                <i class="bi bi-info-circle"></i>
+                <i class="bi bi-info-circle text-primary"></i>
                 <div>
                   <span class="portal-info-value" style="color: #6c757d;">Sin datos de instalación</span>
                 </div>
@@ -435,7 +435,7 @@
             }
             @if (c.costoInstalacion) {
               <div class="portal-info-row">
-                <i class="bi bi-cash"></i>
+                <i class="bi bi-cash text-primary"></i>
                 <div>
                   <span class="portal-info-label">Costo instalación</span>
                   <span class="portal-info-value">${{ c.costoInstalacion | number:'1.2-2' }}</span>
