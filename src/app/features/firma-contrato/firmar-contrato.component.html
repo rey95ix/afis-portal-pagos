@@ -112,7 +112,7 @@
         <button
           class="btn btn-primary w-100"
           (click)="firmar()"
-          [disabled]="state() === 'signing' || isFirmaVacia"
+          [disabled]="state() === 'signing' || !hasFirma()"
         >
           <span *ngIf="state() === 'signing'" class="spinner-border spinner-border-sm me-2"></span>
           {{ state() === 'signing' ? 'Procesando...' : 'Firmar Contrato' }}

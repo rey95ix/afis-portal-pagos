@@ -36,6 +36,7 @@ export class FirmarContratoComponent implements OnInit, OnDestroy, AfterViewInit
   contrato = signal<any>(null);
   pdfUrl = signal<string | null>(null);
   pdfError = signal(false);
+  hasFirma = signal(false);
   safePdfUrl = computed<SafeResourceUrl | null>(() => {
     const url = this.pdfUrl();
     return url ? this.sanitizer.bypassSecurityTrustResourceUrl(url) : null;
@@ -104,6 +105,9 @@ export class FirmarContratoComponent implements OnInit, OnDestroy, AfterViewInit
       backgroundColor: 'rgb(255, 255, 255)',
       penColor: 'rgb(0, 0, 0)',
     });
+    this.signaturePad.addEventListener('endStroke', () => {
+      this.hasFirma.set(true);
+    });
 
     this.resizeObserver = new ResizeObserver(() => {
       this.resizeCanvas(canvas);
@@ -127,6 +131,7 @@ export class FirmarContratoComponent implements OnInit, OnDestroy, AfterViewInit
     }
     if (this.signaturePad) {
       this.signaturePad.clear();
+      this.hasFirma.set(false);
     }
   }
 
@@ -139,10 +144,11 @@ export class FirmarContratoComponent implements OnInit, OnDestroy, AfterViewInit
 
   limpiarFirma(): void {
     this.signaturePad?.clear();
+    this.hasFirma.set(false);
   }
 
   firmar(): void {
-    if (!this.signaturePad || this.signaturePad.isEmpty()) {
+    if (!this.signaturePad || !this.hasFirma()) {
       return;
     }
 
@@ -164,7 +170,4 @@ export class FirmarContratoComponent implements OnInit, OnDestroy, AfterViewInit
     });
   }
 
-  get isFirmaVacia(): boolean {
-    return !this.signaturePad || this.signaturePad.isEmpty();
-  }
 }
