@@ -63,6 +63,10 @@ export const routes: Routes = [
         path: 'contratos/:id',
         loadComponent: () => import('./features/portal/contratos/contrato-detalle/contrato-detalle.component').then(m => m.ContratoDetalleComponent)
       },
+      {
+        path: 'contratos/:id/facturas/:idFactura',
+        loadComponent: () => import('./features/portal/contratos/factura-detalle/factura-detalle.component').then(m => m.FacturaDetalleComponent)
+      },
       { path: '', redirectTo: 'contratos', pathMatch: 'full' }
     ]
   },

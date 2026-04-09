@@ -1,0 +1,375 @@
+<a [routerLink]="['/portal/contratos', idContrato()]" class="contrato-back-btn">
+  <i class="bi bi-arrow-left"></i> Volver al contrato
+</a>
+
+@if (loading()) {
+  <div class="portal-loading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p>Cargando detalle de la factura...</p>
+  </div>
+} @else if (error()) {
+  <div class="portal-error">
+    <i class="bi bi-exclamation-triangle"></i>
+    <span>No se pudo cargar la factura. Verifica que exista y pertenezca a tu contrato.</span>
+  </div>
+} @else if (factura(); as f) {
+  <!-- Hero -->
+  <div class="contrato-hero">
+    <div class="contrato-hero-code">
+      Factura {{ f.numeroFactura || '—' }}
+    </div>
+    <span class="portal-servicio-badge" [class]="getEstadoPagoBadgeClass(f.estadoPago)">
+      {{ f.estadoPago }}
+    </span>
+    <div class="contrato-hero-plan text-primary">
+      @if (f.esInstalacion) {
+        Instalación
+      } @else if (f.numeroCuota) {
+        Cuota {{ f.numeroCuota }}@if (f.totalCuotas) { / {{ f.totalCuotas }} }
+      } @else {
+        {{ f.tipoFactura || 'Documento' }}
+      }
+    </div>
+    <div class="contrato-hero-type">
+      Emitida: {{ formatDate(f.fechaCreacion) }}
+    </div>
+    <div class="contrato-hero-price text-primary">
+      ${{ f.total | number:'1.2-2' }}
+    </div>
+  </div>
+
+  <!-- Acciones -->
+  @if (canDownloadPdf()) {
+    <div class="portal-info-section">
+      <button class="btn btn-primary w-100" (click)="descargarPdf()" [disabled]="downloadingPdf()">
+        @if (downloadingPdf()) {
+          <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+          Descargando...
+        } @else {
+          <i class="bi bi-file-earmark-pdf me-1"></i>
+          Descargar PDF
+        }
+      </button>
+    </div>
+  }
+
+  <!-- Datos del documento (DTE) -->
+  <div class="portal-info-section">
+    <h3 class="portal-info-title"><i class="bi bi-file-earmark-text"></i> Documento Tributario</h3>
+    <div class="portal-info-card">
+      <div class="portal-info-row">
+        <i class="bi bi-tag text-primary"></i>
+        <div>
+          <span class="portal-info-label">Tipo</span>
+          <span class="portal-info-value">{{ f.tipoFactura || '-' }}</span>
+        </div>
+      </div>
+      <div class="portal-info-row">
+        <i class="bi bi-patch-check text-primary"></i>
+        <div>
+          <span class="portal-info-label">Estado DTE</span>
+          <span class="portal-info-value">
+            <span class="portal-servicio-badge" [class]="getEstadoDteBadgeClass(f.estadoDte)">
+              {{ f.estadoDte }}
+            </span>
+          </span>
+        </div>
+      </div>
+      @if (f.codigoGeneracion) {
+        <div class="portal-info-row">
+          <i class="bi bi-hash text-primary"></i>
+          <div>
+            <span class="portal-info-label">Código de generación</span>
+            <span class="portal-info-value" style="word-break: break-all;">{{ f.codigoGeneracion }}</span>
+          </div>
+        </div>
+      }
+      @if (f.numeroControl) {
+        <div class="portal-info-row">
+          <i class="bi bi-upc text-primary"></i>
+          <div>
+            <span class="portal-info-label">Número de control</span>
+            <span class="portal-info-value" style="word-break: break-all;">{{ f.numeroControl }}</span>
+          </div>
+        </div>
+      }
+      @if (f.selloRecepcion) {
+        <div class="portal-info-row">
+          <i class="bi bi-shield-check text-primary"></i>
+          <div>
+            <span class="portal-info-label">Sello MH</span>
+            <span class="portal-info-value" style="word-break: break-all;">{{ f.selloRecepcion }}</span>
+          </div>
+        </div>
+      }
+      @if (f.fechaRecepcionMh) {
+        <div class="portal-info-row">
+          <i class="bi bi-calendar-check text-primary"></i>
+          <div>
+            <span class="portal-info-label">Fecha procesamiento MH</span>
+            <span class="portal-info-value">{{ formatDateTime(f.fechaRecepcionMh) }}</span>
+          </div>
+        </div>
+      } 
+      @if (f.metodoPago) {
+        <div class="portal-info-row">
+          <i class="bi bi-credit-card-2-front text-primary"></i>
+          <div>
+            <span class="portal-info-label">Método de pago</span>
+            <span class="portal-info-value">{{ f.metodoPago }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Datos del cliente -->
+  <div class="portal-info-section">
+    <h3 class="portal-info-title"><i class="bi bi-person"></i> Datos del Cliente</h3>
+    <div class="portal-info-card">
+      @if (f.clienteNombre) {
+        <div class="portal-info-row">
+          <i class="bi bi-person text-primary"></i>
+          <div>
+            <span class="portal-info-label">Nombre</span>
+            <span class="portal-info-value">{{ f.clienteNombre }}</span>
+          </div>
+        </div>
+      }
+      @if (f.clienteNit) {
+        <div class="portal-info-row">
+          <i class="bi bi-card-text text-primary"></i>
+          <div>
+            <span class="portal-info-label">NIT / DUI</span>
+            <span class="portal-info-value">{{ f.clienteNit }}</span>
+          </div>
+        </div>
+      }
+      @if (f.clienteNrc) {
+        <div class="portal-info-row">
+          <i class="bi bi-card-list text-primary"></i>
+          <div>
+            <span class="portal-info-label">NRC</span>
+            <span class="portal-info-value">{{ f.clienteNrc }}</span>
+          </div>
+        </div>
+      }
+      @if (f.clienteDireccion) {
+        <div class="portal-info-row">
+          <i class="bi bi-geo-alt text-primary"></i>
+          <div>
+            <span class="portal-info-label">Dirección</span>
+            <span class="portal-info-value">{{ f.clienteDireccion }}</span>
+          </div>
+        </div>
+      }
+      @if (f.clienteTelefono) {
+        <div class="portal-info-row">
+          <i class="bi bi-telephone text-primary"></i>
+          <div>
+            <span class="portal-info-label">Teléfono</span>
+            <span class="portal-info-value">{{ f.clienteTelefono }}</span>
+          </div>
+        </div>
+      }
+      @if (f.clienteCorreo) {
+        <div class="portal-info-row">
+          <i class="bi bi-envelope text-primary"></i>
+          <div>
+            <span class="portal-info-label">Correo</span>
+            <span class="portal-info-value">{{ f.clienteCorreo }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Cuota / periodo -->
+  @if (f.numeroCuota || f.periodoInicio || f.fechaVencimiento) {
+    <div class="portal-info-section">
+      <h3 class="portal-info-title"><i class="bi bi-calendar-range"></i> Período facturado</h3>
+      <div class="portal-info-card">
+        @if (f.periodoInicio && f.periodoFin) {
+          <div class="portal-info-row">
+            <i class="bi bi-calendar3 text-primary"></i>
+            <div>
+              <span class="portal-info-label">Período</span>
+              <span class="portal-info-value">{{ formatPeriodo(f.periodoInicio, f.periodoFin) }}</span>
+            </div>
+          </div>
+        }
+        @if (f.fechaVencimiento) {
+          <div class="portal-info-row">
+            <i class="bi bi-calendar-x text-primary"></i>
+            <div>
+              <span class="portal-info-label">Vencimiento</span>
+              <span class="portal-info-value">{{ formatDate(f.fechaVencimiento) }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Detalle (líneas de factura) -->
+  <div class="portal-info-section">
+    <h3 class="portal-info-title"><i class="bi bi-list-ul"></i> Detalle</h3>
+    <div class="portal-info-card">
+      <div class="table-responsive">
+        <table class="table table-sm mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Descripción</th>
+              <th class="text-end">Cant.</th>
+              <th class="text-end">P. Unit.</th>
+              <th class="text-end">Desc.</th>
+              <th class="text-end">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of f.detalles; track item.idDetalle) {
+              <tr>
+                <td>{{ item.numItem }}</td>
+                <td>
+                  {{ item.nombre }}
+                  @if (item.descripcion) {
+                    <div class="text-muted" style="font-size: 0.85rem;">{{ item.descripcion }}</div>
+                  }
+                </td>
+                <td class="text-end">{{ item.cantidad | number:'1.0-2' }}</td>
+                <td class="text-end">${{ item.precioUnitario | number:'1.2-2' }}</td>
+                <td class="text-end">
+                  @if (item.descuento > 0) {
+                    ${{ item.descuento | number:'1.2-2' }}
+                  } @else {
+                    -
+                  }
+                </td>
+                <td class="text-end fw-bold">${{ item.total | number:'1.2-2' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Totales -->
+  <div class="portal-info-section">
+    <h3 class="portal-info-title"><i class="bi bi-calculator"></i> Totales</h3>
+    <div class="portal-info-card">
+      @if (f.totalGravada > 0) {
+        <div class="portal-info-row">
+          <i class="bi bi-dash text-primary"></i>
+          <div>
+            <span class="portal-info-label">Subtotal gravado</span>
+            <span class="portal-info-value">${{ f.totalGravada | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      }
+      @if (f.totalExenta > 0) {
+        <div class="portal-info-row">
+          <i class="bi bi-dash text-primary"></i>
+          <div>
+            <span class="portal-info-label">Subtotal exento</span>
+            <span class="portal-info-value">${{ f.totalExenta | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      }
+      @if (f.totalNoSuj > 0) {
+        <div class="portal-info-row">
+          <i class="bi bi-dash text-primary"></i>
+          <div>
+            <span class="portal-info-label">No sujeto</span>
+            <span class="portal-info-value">${{ f.totalNoSuj | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      }
+      <div class="portal-info-row">
+        <i class="bi bi-dash-circle text-primary"></i>
+        <div>
+          <span class="portal-info-label">Subtotal</span>
+          <span class="portal-info-value">${{ f.subtotal | number:'1.2-2' }}</span>
+        </div>
+      </div>
+      @if (f.descuento > 0) {
+        <div class="portal-info-row">
+          <i class="bi bi-tag text-primary"></i>
+          <div>
+            <span class="portal-info-label">Descuento</span>
+            <span class="portal-info-value">-${{ f.descuento | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      }
+      <div class="portal-info-row">
+        <i class="bi bi-percent text-primary"></i>
+        <div>
+          <span class="portal-info-label">IVA</span>
+          <span class="portal-info-value">${{ f.iva | number:'1.2-2' }}</span>
+        </div>
+      </div>
+      @if (f.montoMora > 0) {
+        <div class="portal-info-row">
+          <i class="bi bi-exclamation-circle text-primary"></i>
+          <div>
+            <span class="portal-info-label">Mora</span>
+            <span class="portal-info-value">${{ f.montoMora | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      }
+      <div class="portal-info-row">
+        <i class="bi bi-cash-stack text-primary"></i>
+        <div>
+          <span class="portal-info-label">Total</span>
+          <span class="portal-info-value" style="font-size: 1.25rem; font-weight: 700;">
+            ${{ f.total | number:'1.2-2' }}
+          </span>
+        </div>
+      </div>
+      @if (f.totalLetras) {
+        <div class="portal-info-row">
+          <i class="bi bi-chat-quote text-primary"></i>
+          <div>
+            <span class="portal-info-label">Son</span>
+            <span class="portal-info-value" style="font-style: italic;">{{ f.totalLetras }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Estado de cobro -->
+  <div class="portal-info-section">
+    <h3 class="portal-info-title"><i class="bi bi-wallet"></i> Estado de Cobro</h3>
+    <div class="portal-info-card">
+      <div class="portal-info-row">
+        <i class="bi bi-check2-circle text-primary"></i>
+        <div>
+          <span class="portal-info-label">Monto abonado</span>
+          <span class="portal-info-value">${{ f.montoAbonado | number:'1.2-2' }}</span>
+        </div>
+      </div>
+      <div class="portal-info-row">
+        <i class="bi bi-hourglass-split text-primary"></i>
+        <div>
+          <span class="portal-info-label">Saldo pendiente</span>
+          <span class="portal-info-value">${{ f.saldoPendiente | number:'1.2-2' }}</span>
+        </div>
+      </div>
+      <div class="portal-info-row">
+        <i class="bi bi-flag text-primary"></i>
+        <div>
+          <span class="portal-info-label">Estado</span>
+          <span class="portal-info-value">
+            <span class="portal-servicio-badge" [class]="getEstadoPagoBadgeClass(f.estadoPago)">
+              {{ f.estadoPago }}
+            </span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+}

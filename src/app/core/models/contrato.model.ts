@@ -77,6 +77,71 @@ export interface FacturaItem {
   estado: string;
 }
 
+export interface FacturaDetalleItem {
+  idDetalle: number;
+  numItem: number;
+  codigo: string | null;
+  nombre: string;
+  descripcion: string | null;
+  cantidad: number;
+  precioUnitario: number;
+  ventaGravada: number;
+  ventaExenta: number;
+  ventaNoSujeto: number;
+  subtotal: number;
+  descuento: number;
+  iva: number;
+  total: number;
+}
+
+export interface FacturaDetalle {
+  idFactura: number;
+  numeroFactura: string | null;
+  fechaCreacion: string;
+
+  clienteNombre: string | null;
+  clienteNit: string | null;
+  clienteNrc: string | null;
+  clienteDireccion: string | null;
+  clienteTelefono: string | null;
+  clienteCorreo: string | null;
+
+  subtotal: number;
+  descuento: number;
+  totalGravada: number;
+  totalExenta: number;
+  totalNoSuj: number;
+  iva: number;
+  total: number;
+  totalLetras: string | null;
+
+  condicionOperacion: number;
+  metodoPago: string | null;
+
+  tipoFactura: string | null;
+  tipoFacturaCodigo: string | null;
+  estadoDte: string;
+  codigoGeneracion: string | null;
+  numeroControl: string | null;
+  selloRecepcion: string | null;
+  fechaRecepcionMh: string | null;
+
+  estado: string;
+  estadoPago: string;
+  montoAbonado: number;
+  saldoPendiente: number;
+
+  numeroCuota: number | null;
+  totalCuotas: number | null;
+  periodoInicio: string | null;
+  periodoFin: string | null;
+  fechaVencimiento: string | null;
+  esInstalacion: boolean;
+  montoMora: number;
+
+  detalles: FacturaDetalleItem[];
+}
+
 export interface PagoTarjetaRequest {
   tokenPago: string;
   idFactura: number;

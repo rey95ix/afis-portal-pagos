@@ -1,6 +1,6 @@
 import { Component, inject, signal, computed, effect, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ContratosService } from '../../../../core/services/contratos.service';
 import { ContratoDetalle, FacturaItem, PagoTarjetaResponse } from '../../../../core/models';
@@ -13,6 +13,7 @@ import { ContratoDetalle, FacturaItem, PagoTarjetaResponse } from '../../../../c
 })
 export class ContratoDetalleComponent implements OnInit {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private contratosService = inject(ContratosService);
   private fb = inject(FormBuilder);
 
@@ -208,6 +209,13 @@ export class ContratoDetalleComponent implements OnInit {
     this.showDetalles.update(v => !v);
   }
 
+  verFactura(factura: FacturaItem): void {
+    if (factura.estadoPago !== 'PAGADO') return;
+    const idContrato = this.contrato()?.idContrato;
+    if (!idContrato) return;
+    this.router.navigate(['/portal/contratos', idContrato, 'facturas', factura.idFactura]);
+  }
+
   dismissResult(): void {
     this.paymentResult.set(null);
   }
@@ -276,6 +284,7 @@ export class ContratoDetalleComponent implements OnInit {
 
   formatMesPeriodo(inicio: string | null): string {
     if (!inicio) return '-';
+    console.log('Formateando periodo con inicio:', inicio);
     const d = new Date(inicio);
     const mes = d.toLocaleDateString('es-SV', { month: 'long' });
     const anio = d.getFullYear();

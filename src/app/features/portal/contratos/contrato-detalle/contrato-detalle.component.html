@@ -237,7 +237,12 @@
       <div class="factura-cards">
         @for (factura of facturas(); track factura.idFactura) {
           <div class="factura-card" [ngClass]="getFacturaCardClass(factura.estadoPago)"
-               [class.factura-card--selected]="facturaAutoSeleccionada()?.idFactura === factura.idFactura">
+               [class.factura-card--selected]="facturaAutoSeleccionada()?.idFactura === factura.idFactura"
+               [style.cursor]="factura.estadoPago === 'PAGADO' ? 'pointer' : null"
+               [attr.role]="factura.estadoPago === 'PAGADO' ? 'button' : null"
+               [attr.tabindex]="factura.estadoPago === 'PAGADO' ? 0 : null"
+               (click)="verFactura(factura)"
+               (keyup.enter)="verFactura(factura)">
             <div class="factura-card-header">
               <div class="factura-card-header-left">
                 <div>
@@ -245,7 +250,7 @@
                     @if (factura.esInstalacion) {
                       Instalación
                     } @else {
-                      {{ formatMesPeriodo(factura.periodoInicio) }}
+                      {{ formatMesPeriodo(factura.periodoFin) }}
                     }
                   </div>
                   <div class="factura-card-periodo">Vence: {{ formatDate(factura.fechaVencimiento) }}</div>
@@ -298,12 +303,17 @@
               </thead>
               <tbody>
                 @for (factura of facturas(); track factura.idFactura) {
-                  <tr [class.table-active]="facturaAutoSeleccionada()?.idFactura === factura.idFactura">
+                  <tr [class.table-active]="facturaAutoSeleccionada()?.idFactura === factura.idFactura"
+                      [style.cursor]="factura.estadoPago === 'PAGADO' ? 'pointer' : null"
+                      [attr.role]="factura.estadoPago === 'PAGADO' ? 'button' : null"
+                      [attr.tabindex]="factura.estadoPago === 'PAGADO' ? 0 : null"
+                      (click)="verFactura(factura)"
+                      (keyup.enter)="verFactura(factura)">
                     <td>
                       @if (factura.esInstalacion) {
                         <span class="portal-servicio-badge portal-servicio-badge--activo">Instalación</span>
                       } @else {
-                        {{ factura.numeroCuota }}/{{ factura.totalCuotas }}
+                        {{ factura.numeroCuota }}
                       }
                     </td>
                     <td>{{ formatPeriodo(factura.periodoInicio, factura.periodoFin) }}</td>
